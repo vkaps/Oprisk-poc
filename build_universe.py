@@ -600,11 +600,18 @@ def main():
 
     log("5/5 Matching events to the universe ...", report)
     cands = pd.read_csv(INP / "events_candidates.csv", dtype={"entity_lei": str, "employer_bank": str})
+    nf = INP / "events_nonfine.csv"   # outcomes without a fine (convictions, bans, censures)
+    if nf.exists():
+        cands = pd.concat([cands, pd.read_csv(nf, dtype={"entity_lei": str, "employer_bank": str})], ignore_index=True)
+    if "outcome" not in cands:
+        cands["outcome"] = np.nan
+    cands["outcome"] = cands["outcome"].fillna(
+        cands["source"].map({"ESMA": "sanction or measure (amount not published)"}).fillna("fine"))
     cands = cands[cands["status"] == "include"].copy()
     m = match_events(net, cands, bank_tbl, aliases, report)
     ok, bad = m[m.peer_id.notna()], m[m.peer_id.isna()]
     cols = ["notice_id", "cluster_id", "date", "regulator", "country", "peer_id", "penalised_party",
-            "category", "amount_eur", "description", "source_url", "source"]
+            "category", "outcome", "amount_eur", "description", "source_url", "source"]
     ok[cols].to_csv(INP / "events.csv", index=False)
     bad.to_csv(DATA / "events_unmatched.csv", index=False)
     m.to_csv(DATA / "events_matching_detail.csv", index=False)

@@ -30,12 +30,12 @@ from scipy.special import gammaln
 
 CELLS = ["A1", "A2", "B1", "B2", "M1", "M2"]
 CELL_LABELS = {
-    "A1": "Inside information - bank fined",
-    "A2": "Inside information - employee fined",
-    "B1": "Market manipulation - bank fined",
-    "B2": "Market manipulation - employee fined",
-    "M1": "All market abuse - bank fined (A1+B1+type unknown)",
-    "M2": "All market abuse - employee fined (A2+B2+type unknown)",
+    "A1": "Inside information - bank sanctioned",
+    "A2": "Inside information - employee sanctioned or convicted",
+    "B1": "Market manipulation - bank sanctioned",
+    "B2": "Market manipulation - employee sanctioned or convicted",
+    "M1": "All market abuse - bank sanctioned (A1+B1+type unknown)",
+    "M2": "All market abuse - employee sanctioned or convicted (A2+B2+type unknown)",
 }
 # Events whose type is unknown (e.g. ESMA register, no text) only enter M1/M2.
 CATEGORY_CODE = {"inside_information": "A", "market_manipulation": "B",
@@ -83,6 +83,8 @@ def cluster_events(notices: pd.DataFrame) -> pd.DataFrame:
         date=("date", "min"),
         amount_eur=("amount_eur", lambda s: s.sum(min_count=1)),  # stays NaN if unknown
         n_notices=("notice_id", "count"),
+        outcome=("outcome", lambda s: "; ".join(sorted(set(map(str, s.dropna())))) or "fine")
+        if "outcome" in ev else ("notice_id", lambda s: "fine"),
         regulators=("regulator", lambda s: "; ".join(sorted(set(map(str, s))))),
     )
     g["year"] = g["date"].dt.year
@@ -300,13 +302,26 @@ def size_elasticity(events: pd.DataFrame, panel: pd.DataFrame) -> tuple[float, f
 def severity_sample(scaled: pd.DataFrame, cell: str, min_n: int = 8) -> tuple[np.ndarray, str]:
     """Known scaled amounts for a cell; pooled with the other cells of the same
     party (bank / employee) when the cell has fewer than min_n amounts."""
-    x = scaled.loc[scaled["cell"].isin(MEMBERS[cell]), "amount_scaled_eur"].dropna().values
+    pos = scaled["amount_scaled_eur"] > 0      # outcomes without a fine (0) are not amounts
+    x = scaled.loc[scaled["cell"].isin(MEMBERS[cell]) & pos, "amount_scaled_eur"].values
     if len(x) >= min_n:
         return x, "own"
     # pool only with the same party: a fine on a person is not comparable to one on a bank
     party = cell[-1]
-    x = scaled.loc[scaled["cell"].str.endswith(party), "amount_scaled_eur"].dropna().values
+    x = scaled.loc[scaled["cell"].str.endswith(party) & pos, "amount_scaled_eur"].values
     return x, f"pooled ({'bank' if party == '1' else 'employee'} cells, {len(x)} amounts)"
+
+
+def share_without_fine(events: pd.DataFrame, cell: str) -> tuple[float, int, int]:
+    """Share of events (with known outcome) that carried no fine, e.g. a criminal
+    conviction or a ban. Uses the cell's own events, else the same party."""
+    known = events["amount_eur"].notna()
+    for sel in (events["cell"].isin(MEMBERS[cell]), events["cell"].str.endswith(cell[-1])):
+        k = events[sel & known]
+        if len(k) >= 3:
+            z = int((k["amount_eur"] == 0).sum())
+            return z / len(k), z, len(k)
+    return 0.0, 0, 0
 
 
 def scale_amounts(events: pd.DataFrame, panel: pd.DataFrame, bank_size: float,
@@ -349,14 +364,22 @@ class Severity:
         self.p_tail = float(np.mean(x > self.tail_u)) if len(x) else 0.0
 
     def describe(self) -> dict:
-        d = {"n_used": self.n, "threshold_eur": self.u,
+        d = {"n_used": self.n, "share_no_fine": self.p_zero, "threshold_eur": self.u,
              "lognormal_median_eur": float(np.exp(self.mu_log)),
              "lognormal_sigma": self.sigma_log}
         if self.gpd:
             d.update({"gpd_from_eur": float(self.tail_u), "gpd_shape_xi": self.gpd[0]})
         return d
 
+    p_zero = 0.0   # share of events that end without any fine (set by the caller)
+
     def sample(self, n: int, rng: np.random.Generator) -> np.ndarray:
+        out = self._sample(n, rng)
+        if self.p_zero > 0 and n:
+            out[rng.random(n) < self.p_zero] = 0.0
+        return out
+
+    def _sample(self, n: int, rng: np.random.Generator) -> np.ndarray:
         lu = np.log(self.u)
         a = (lu - self.mu_log) / self.sigma_log
         z = stats.truncnorm.rvs(a, np.inf, size=n, random_state=rng)
