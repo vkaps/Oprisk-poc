@@ -1,0 +1,31 @@
+name: Probe source pages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/probe.yml"]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Save sample pages
+        run: |
+          mkdir -p logs/probe
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+          get() { curl -sSL -m 60 -A "$UA" -o "logs/probe/$1" -w "%{http_code} $1\n" "$2" || echo "fail $1"; }
+          {
+          get fca_fn_1.html "https://www.fca.org.uk/publications/search-results?np_category=notices%20and%20decisions-final%20notices"
+          get fca_fn_2.html "https://www.fca.org.uk/publications/search-results?np_category=notices%20and%20decisions-final%20notices&start=11"
+          get fca_pr_insider.html "https://www.fca.org.uk/news/search-results?np_category=press%20releases&search_term=insider%20dealing"
+          get fca_pr_insider_2.html "https://www.fca.org.uk/news/search-results?np_category=press%20releases&search_term=insider%20dealing&start=11"
+          get esma_mar_sample.json "https://registers.esma.europa.eu/solr/esma_registers_sanctions/select?q=sn_sanctionLegalFrameworkName:MAR&rows=3000&wt=json&fl=sn_sanctionEsmaID,sn_entityName,sn_date,sn_nature,sn_natureFullName,sn_ncaCodeFullName,sn_entityLEI"
+          } | tee logs/probe/status.txt
+          ls -la logs/probe
+      - name: Save
+        run: |
+          git config user.name "oprisk-bot"; git config user.email "oprisk-bot@users.noreply.github.com"
+          git add logs/probe; git commit -m "Probe source pages" || true
+          git pull --rebase origin main || true; git push
