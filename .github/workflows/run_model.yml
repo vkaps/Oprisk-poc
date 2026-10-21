@@ -2,6 +2,9 @@ name: Run op risk model
 
 on:
   workflow_dispatch:          # "Run workflow" button (works from the GitHub phone app)
+  push:                       # rerun when code or inputs change
+    branches: [main]
+    paths: ["*.py", "inputs/**", "OpRisk_PoC.ipynb", ".github/workflows/**"]
   schedule:
     - cron: "17 6 3 * *"      # monthly, 3rd day 06:17 UTC - picks up new fines
 
@@ -45,4 +48,5 @@ jobs:
           git config user.email "oprisk-bot@users.noreply.github.com"
           git add -A data inputs results OpRisk_PoC_executed.ipynb || true
           git commit -m "Model run $(date -u +%Y-%m-%d)" || echo "nothing to commit"
+          git pull --rebase origin main || true
           git push
