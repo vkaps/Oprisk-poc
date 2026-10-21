@@ -1,6 +1,6 @@
 [NbConvertApp] Converting notebook OpRisk_PoC.ipynb to notebook
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
-[NbConvertApp] Writing 271616 bytes to OpRisk_PoC_executed.ipynb
+[NbConvertApp] Writing 286035 bytes to OpRisk_PoC_executed.ipynb
 [NbConvertApp] Converting notebook OpRisk_PoC_executed.ipynb to html
 [NbConvertApp] WARNING | Alternative text is missing on 4 image(s).
-[NbConvertApp] Writing 591043 bytes to results/OpRisk_PoC_executed.html
+[NbConvertApp] Writing 612058 bytes to results/OpRisk_PoC_executed.html

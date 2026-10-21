@@ -1,5 +1,6 @@
 {
- "run_utc": "2026-10-21T15:47:14",
+ "size_in_frequency": false,
+ "run_utc": "2026-10-21T16:08:44",
  "data_mode": "REAL",
  "target_year": 2026,
  "target_size_eur_bn": 86.314,
@@ -7,10 +8,11 @@
  "n_banks": 27,
  "n_bank_years": 349,
  "n_banks_no_event": 19,
- "n_events": 13,
+ "n_events": 19,
  "events_by_cell": {
   "B1": 9,
-  "B2": 3,
+  "B2": 7,
+  "A2": 2,
   "A1": 1
  },
  "banks_by_region": {
@@ -24,6 +26,6 @@
   2025
  ],
  "size_elasticity": 0.25,
- "elasticity_note": "literature value (estimate -0.25 from 13 amounts not reliable)",
+ "elasticity_note": "literature value (estimate -0.25 from 19 amounts not reliable)",
  "internal_years": 16
 }
