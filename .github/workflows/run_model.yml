@@ -26,27 +26,33 @@ jobs:
         run: pip install pandas numpy scipy matplotlib openpyxl nbconvert ipykernel
 
       - name: 1. Extract fines (ESMA, FCA)
-        run: python -u extract_sources.py
+        run: |
+          mkdir -p data logs
+          set -o pipefail
+          python -u extract_sources.py 2>&1 | tee logs/1_extract.log
 
       - name: 2. Build bank universe and match events
         env:
           SEC_CONTACT: ${{ secrets.SEC_CONTACT }}
-        run: python -u build_universe.py --sec-contact "$SEC_CONTACT"
+        run: |
+          set -o pipefail
+          python -u build_universe.py --sec-contact "$SEC_CONTACT" 2>&1 | tee logs/2_universe.log
 
       - name: 3. Run the workbook on real data
         env:
           OPRISK_DATA_MODE: REAL
         run: |
-          jupyter nbconvert --to notebook --execute OpRisk_PoC.ipynb \
-            --output OpRisk_PoC_executed.ipynb --ExecutePreprocessor.timeout=1800
-          jupyter nbconvert --to html OpRisk_PoC_executed.ipynb --output-dir results
+          set -o pipefail
+          (jupyter nbconvert --to notebook --execute OpRisk_PoC.ipynb \
+             --output OpRisk_PoC_executed.ipynb --ExecutePreprocessor.timeout=1800 &&
+           jupyter nbconvert --to html OpRisk_PoC_executed.ipynb --output-dir results) 2>&1 | tee logs/3_workbook.log
 
       - name: Save results
         if: always()
         run: |
           git config user.name "oprisk-bot"
           git config user.email "oprisk-bot@users.noreply.github.com"
-          git add -A data inputs results OpRisk_PoC_executed.ipynb || true
+          git add -A .
           git commit -m "Model run $(date -u +%Y-%m-%d)" || echo "nothing to commit"
           git pull --rebase origin main || true
           git push
