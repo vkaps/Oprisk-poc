@@ -50,7 +50,7 @@
   SEC BBVA: 2015-2025
   SEC ING: 2015-2025
   EBA coverage too small - adding European banks from Wikidata ...
-  Wikidata: failed (HTTP Error 504: Gateway Timeout)
+  Wikidata: failed (HTTP Error 429: Please try again later (a607b0e))
 4/5 Assembling universe ...
 
 Universe: 27 bank groups, 349 bank-years (12% of sizes imputed from nearest year)
