@@ -9,6 +9,7 @@ C,\bciti(bank|group|corp)?\b
 WFC,wells fargo
 GS,goldman sachs
 MS,morgan stanley
+BK,bank of new york|bny mellon
 STT,state street
 UBS,\bubs\b
 CS,credit suisse

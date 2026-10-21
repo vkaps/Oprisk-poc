@@ -32,7 +32,7 @@
   SEC WFC: 2008-2025
   SEC GS: 2008-2025
   SEC MS: 2008-2025
-  SEC BK: ticker BK not found
+  SEC BK: 2008-2025
   SEC STT: 2008-2025
   SEC UBS: 2015-2025
   SEC CS: 2008-2022
@@ -49,16 +49,18 @@
   SEC SAN: 2015-2025
   SEC BBVA: 2015-2025
   SEC ING: 2015-2025
+  EBA coverage too small - adding European banks from Wikidata ...
+  Wikidata: failed (HTTP Error 429: Aggressively rate-limiting to 1 req / min - this rule was created during active wdqs outage (797a132))
 4/5 Assembling universe ...
 
-Universe: 26 bank groups, 336 bank-years (13% of sizes imputed from nearest year)
+Universe: 27 bank groups, 349 bank-years (12% of sizes imputed from nearest year)
 region
 EU        4
 OTHER    11
 UK        4
-US        7
+US        8
 5/5 Matching events to the universe ...
   13 events matched to a universe bank, 23 not in the universe (see data/events_unmatched.csv)
-  18 of 26 banks have no event: they are the non-events
+  19 of 27 banks have no event: they are the non-events
 
 Done. Open the workbook with DATA_MODE = 'REAL'.
