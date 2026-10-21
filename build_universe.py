@@ -122,17 +122,35 @@ def region_of(country: str) -> str:
     return "UK" if c == "GB" else "US" if c == "US" else "EU" if c in EEA else "OTHER"
 
 
+BROWSER = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                         "(KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+           "Accept-Language": "en-GB,en;q=0.9"}
+
+
 class Net:
     def __init__(self, sec_contact: str | None):
-        self.sec_contact = sec_contact
+        # one line, no control characters (a pasted secret may contain a line break)
+        self.sec_contact = " ".join(str(sec_contact).split()) if sec_contact else None
 
-    def get(self, url: str, timeout=90, binary=False):
-        headers = dict(UA)
+    def get(self, url: str, timeout=90, binary=False, tries=3):
+        headers = dict(BROWSER)
         if "sec.gov" in url and self.sec_contact:
-            headers["User-Agent"] = f"oprisk-poc {self.sec_contact}"
-        with urlopen(Request(url, headers=headers), timeout=timeout) as r:
-            b = r.read()
-        return b if binary else b.decode("utf-8", errors="replace")
+            headers = {"User-Agent": f"oprisk-poc {self.sec_contact}", "Accept-Encoding": "identity"}
+        last = None
+        for i in range(tries):
+            try:
+                with urlopen(Request(url, headers=headers), timeout=timeout) as r:
+                    b = r.read()
+                return b if binary else b.decode("utf-8", errors="replace")
+            except HTTPError as e:
+                last = e
+                if e.code not in (429, 500, 502, 503, 504):
+                    break
+            except Exception as e:  # never echo request headers (they hold the contact)
+                last = RuntimeError(type(e).__name__)
+            time.sleep(5 * (i + 1))
+        raise last
 
 
 def log(msg, report):

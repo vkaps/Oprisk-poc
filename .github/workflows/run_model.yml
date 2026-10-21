@@ -25,6 +25,15 @@ jobs:
       - name: Install packages
         run: pip install pandas numpy scipy matplotlib openpyxl nbconvert ipykernel
 
+      - name: 0. Check data sites are reachable
+        run: |
+          mkdir -p logs
+          for u in https://www.eba.europa.eu/assets/TE2024/Full_database/256109/TR_Metadata.xlsx \
+                   https://www.eba.europa.eu/ https://data-api.ecb.europa.eu/ https://www.sec.gov/ https://api.gleif.org/api/v1/lei-records?page%5Bsize%5D=1; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -m 30 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0" "$u")
+            echo "$code $u"
+          done | tee logs/0_reachability.log
+
       - name: 1. Extract fines (ESMA, FCA)
         run: |
           mkdir -p data logs
