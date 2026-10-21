@@ -1,5 +1,5 @@
 {
- "run_utc": "2026-10-21T14:18:56",
+ "run_utc": "2026-10-21T14:37:55",
  "data_mode": "REAL",
  "target_year": 2026,
  "target_size_eur_bn": 86.314,
@@ -23,6 +23,6 @@
   2013,
   2025
  ],
- "size_elasticity": -0.24614763346692792,
+ "size_elasticity": -0.246147633466925,
  "internal_years": 16
 }
