@@ -170,7 +170,8 @@ class NBFit:
         return float(np.exp(self.design(log_size, period, region, regions) @ self.beta))
 
 
-def fit_nb(counts: pd.DataFrame, regions: list[str], prior_sd: float = 2.0) -> NBFit:
+def fit_nb(counts: pd.DataFrame, regions: list[str], prior_sd: float = 2.0,
+           use_size: bool = True) -> NBFit:
     """NB2 regression of yearly event counts.
     log mu = b0 + b1*(log size - centre) + period effects + region effects.
     Baselines are the first regime and first region present in the data (so the
@@ -181,7 +182,9 @@ def fit_nb(counts: pd.DataFrame, regions: list[str], prior_sd: float = 2.0) -> N
         is "rare" (about half an event over the whole sample), never exactly 0."""
     d = counts
     center = float(d["log_size"].mean())
-    cols = {"const": np.ones(len(d)), "log_size_c": d["log_size"].values - center}
+    cols = {"const": np.ones(len(d))}
+    if use_size:  # otherwise every bank has the same rate, whatever its size
+        cols["log_size_c"] = d["log_size"].values - center
     present_p = [p for p, *_ in PERIODS if (d["period"] == p).any()]
     for p in present_p[1:]:
         cols[f"period_{p}"] = (d["period"] == p).astype(float).values
