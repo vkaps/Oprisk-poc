@@ -88,7 +88,7 @@ GROUPS = [
     ("WFC", "Wells Fargo", "US", "US", "WFC", r"wells fargo"),
     ("GS", "Goldman Sachs", "US", "US", "GS", r"goldman sachs"),
     ("MS", "Morgan Stanley", "US", "US", "MS", r"morgan stanley"),
-    ("BK", "Bank of New York Mellon", "US", "US", "BK", r"bank of new york|bny mellon"),
+    ("BK", "Bank of New York Mellon", "US", "US", ("BK", "BNY"), r"bank of new york|bny mellon"),
     ("STT", "State Street", "US", "US", "STT", r"state street"),
     ("UBS", "UBS Group", "CH", "OTHER", "UBS", r"\bubs\b"),
     ("CS", "Credit Suisse Group", "CH", "OTHER", 1159510, r"credit suisse"),
@@ -133,8 +133,11 @@ class Net:
         # one line, no control characters (a pasted secret may contain a line break)
         self.sec_contact = " ".join(str(sec_contact).split()) if sec_contact else None
 
-    def get(self, url: str, timeout=90, binary=False, tries=3):
+    def get(self, url: str, timeout=90, binary=False, tries=3, wikidata=False):
         headers = dict(BROWSER)
+        if wikidata:  # Wikidata asks for an identifying agent, no contact needed
+            headers = {"User-Agent": "oprisk-poc/1.0 (research; github.com/vkaps/Oprisk-poc)",
+                       "Accept": "application/sparql-results+json"}
         if "sec.gov" in url and self.sec_contact:
             headers = {"User-Agent": f"oprisk-poc {self.sec_contact}", "Accept-Encoding": "identity"}
         last = None
@@ -273,6 +276,66 @@ def build_eba(net, report):
 
 
 # ---------------------------------------------------------------------------
+# Wikidata (fallback for European banks when the EBA site is unreachable)
+# ---------------------------------------------------------------------------
+WIKIDATA = "https://query.wikidata.org/sparql"
+WD_QUERY = """
+SELECT ?bank ?bankLabel ?lei ?cc ?date ?amount ?ccy WHERE {
+  ?bank p:P2403 ?st .
+  ?st ps:P2403 ?amount ; pq:P585 ?date .
+  OPTIONAL { ?st psv:P2403/wikibase:quantityUnit/wdt:P498 ?ccy . }
+  ?bank wdt:P31/wdt:P279* wd:Q22687 .
+  ?bank wdt:P17/wdt:P297 ?cc .
+  VALUES ?cc { %s }
+  OPTIONAL { ?bank wdt:P1278 ?lei . }
+  FILTER(YEAR(?date) >= 2012)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}"""
+WD_COUNTRIES = sorted(EEA | {"GB", "CH"})
+
+
+def build_wikidata(net, fx, report) -> pd.DataFrame:
+    from urllib.parse import urlencode
+    q = WD_QUERY % " ".join(f'"{c}"' for c in WD_COUNTRIES)
+    url = WIKIDATA + "?" + urlencode({"query": q, "format": "json"})
+    try:
+        rows = json.loads(net.get(url, timeout=180, wikidata=True))["results"]["bindings"]
+    except Exception as e:
+        log(f"  Wikidata: failed ({e})", report)
+        return pd.DataFrame()
+    recs = []
+    for r in rows:
+        try:
+            amt = float(r["amount"]["value"])
+            y = int(r["date"]["value"][:4])
+        except (KeyError, ValueError):
+            continue
+        ccy = r.get("ccy", {}).get("value", "EUR")
+        eur = amt * fx_rate(fx, ccy, y)
+        if not np.isfinite(eur) or eur < 5e8:       # < EUR 0.5bn: not a bank group / unit error
+            continue
+        recs.append({"wd": r["bank"]["value"].rsplit("/", 1)[-1], "name": r["bankLabel"]["value"],
+                     "lei": r.get("lei", {}).get("value", ""), "country": r["cc"]["value"],
+                     "year": y, "total_assets_eur_bn": eur / 1e9})
+    df = pd.DataFrame(recs)
+    if df.empty:
+        log("  Wikidata: no bank sizes returned", report)
+        return df
+    df = df.groupby(["wd", "year"], as_index=False).agg(
+        name=("name", "first"), lei=("lei", "first"), country=("country", "first"),
+        total_assets_eur_bn=("total_assets_eur_bn", "median"))
+    # parent company via GLEIF, so subsidiaries fold into their group
+    cache_f = DATA / "gleif_cache.json"
+    cache = json.loads(cache_f.read_text()) if cache_f.exists() else {}
+    par = {l: gleif_parent(net, l, cache)[0] for l in df["lei"].unique() if len(str(l)) == 20}
+    cache_f.write_text(json.dumps(cache))
+    df["parent_lei"] = df["lei"].map(par).fillna(df["lei"])
+    log(f"  Wikidata: {df.wd.nunique()} European banks with total assets, "
+        f"{df.year.min()}-{df.year.max()}", report)
+    return df
+
+
+# ---------------------------------------------------------------------------
 # SEC (US and foreign banks filing 10-K / 20-F / 40-F)
 # ---------------------------------------------------------------------------
 def sec_assets(facts: dict) -> pd.DataFrame:
@@ -308,7 +371,10 @@ def build_sec(net, fx, report):
     for key, name, ctry, reg, sec, _ in GROUPS:
         if sec is None:
             continue
-        cik = sec if isinstance(sec, int) else tick.get(sec)
+        if isinstance(sec, int):
+            cik = sec
+        else:
+            cik = next((tick[t] for t in ((sec,) if isinstance(sec, str) else sec) if t in tick), None)
         if not cik:
             log(f"  SEC {key}: ticker {sec} not found", report)
             continue
@@ -339,7 +405,7 @@ def group_for_name(name: str) -> str | None:
     return None
 
 
-def assemble(eba_sizes, eba_meta, sec, manual, report) -> tuple[pd.DataFrame, pd.DataFrame]:
+def assemble(eba_sizes, eba_meta, sec, manual, report, wiki=None) -> tuple[pd.DataFrame, pd.DataFrame]:
     banks = {}  # group_key -> dict(name, country, region, leis)
     obs = []
     for key, name, ctry, reg, *_ in GROUPS:
@@ -356,6 +422,22 @@ def assemble(eba_sizes, eba_meta, sec, manual, report) -> tuple[pd.DataFrame, pd
             obs.append({"group_key": key, "year": r.year, "total_assets_eur_bn": r.total_assets_eur_bn, "src": "EBA"})
     for _, r in sec.iterrows():
         obs.append({"group_key": r.group_key, "year": r.year, "total_assets_eur_bn": r.total_assets_eur_bn, "src": "SEC"})
+    if wiki is not None and not wiki.empty:
+        lei_key = {l: k for k, b in banks.items() for l in b["leis"]}
+        # parents first, so a subsidiary finds its parent's key
+        wiki = wiki.assign(is_child=(wiki["parent_lei"] != wiki["lei"]) & wiki["parent_lei"].isin(wiki["lei"]))
+        for (wd, child), g in sorted(wiki.groupby(["wd", "is_child"]), key=lambda t: t[0][1]):
+            nm, lei, ctry, plei = g["name"].iloc[0], g["lei"].iloc[0], g["country"].iloc[0], g["parent_lei"].iloc[0]
+            key = (lei_key.get(lei) or lei_key.get(plei) or group_for_name(nm)
+                   or (f"EBA_{lei}" if f"EBA_{lei}" in banks else f"WD_{wd}"))
+            b = banks.setdefault(key, {"group_key": key, "name": nm, "country": ctry,
+                                       "region": region_of(ctry), "leis": set()})
+            if lei:
+                b["leis"].add(lei)
+                lei_key[lei] = key
+            for _, r in g.iterrows():
+                obs.append({"group_key": key, "year": int(r.year),
+                            "total_assets_eur_bn": float(r.total_assets_eur_bn), "src": "Wikidata"})
     for _, r in manual.dropna(subset=["total_assets_eur_bn"]).iterrows():
         key = r.group_key
         banks.setdefault(key, {"group_key": key, "name": r["name"], "country": r.country,
@@ -367,9 +449,11 @@ def assemble(eba_sizes, eba_meta, sec, manual, report) -> tuple[pd.DataFrame, pd
     # EU groups: EBA first (group level). Non-EU groups: SEC first, because the EBA
     # files only hold their EU subsidiaries (e.g. "J.P. Morgan SE").
     reg = {k: b["region"] for k, b in banks.items()}
-    obs["p"] = [({"EBA": 0, "manual": 1, "SEC": 2} if reg.get(k) == "EU" else
-                 {"SEC": 0, "manual": 1, "EBA": 2})[s] for k, s in zip(obs["group_key"], obs["src"])]
-    obs = obs.sort_values("p").groupby(["group_key", "year"], as_index=False).first()
+    obs["p"] = [({"EBA": 0, "manual": 1, "SEC": 2, "Wikidata": 3} if reg.get(k) == "EU" else
+                 {"SEC": 0, "manual": 1, "EBA": 2, "Wikidata": 3})[s] for k, s in zip(obs["group_key"], obs["src"])]
+    # best source first; within a source the largest entity (the group, not a subsidiary)
+    obs = obs.sort_values(["p", "total_assets_eur_bn"], ascending=[True, False]) \
+             .groupby(["group_key", "year"], as_index=False).first()
 
     # panel: backfill to 2013 with the earliest observed size; forward-fill at most 1 year
     rows = []
@@ -497,9 +581,13 @@ def main():
     eba_sizes, eba_meta = build_eba(net, report)
     log("3/5 SEC filings (US, CH, JP, CA, UK and EU ADRs) ...", report)
     sec = build_sec(net, fx, report)
+    wiki = None
+    if eba_sizes["lei"].nunique() < 50:
+        log("  EBA coverage too small - adding European banks from Wikidata ...", report)
+        wiki = build_wikidata(net, fx, report)
     manual = pd.read_csv(INP / "banks_manual.csv")
     log("4/5 Assembling universe ...", report)
-    panel, bank_tbl = assemble(eba_sizes, eba_meta, sec, manual, report)
+    panel, bank_tbl = assemble(eba_sizes, eba_meta, sec, manual, report, wiki)
     panel.to_csv(INP / "peer_panel.csv", index=False)
     bank_tbl.to_csv(DATA / "universe_banks.csv", index=False)
     aliases = write_aliases(bank_tbl)
