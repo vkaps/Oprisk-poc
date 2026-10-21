@@ -1,0 +1,14 @@
+currency,year,eur_per_unit,note
+GBP,0,1.17,APPROXIMATE default for all years - replace with ECB annual averages per year
+USD,0,0.88,APPROXIMATE default for all years - replace with ECB annual averages per year
+CHF,0,0.9,APPROXIMATE default for all years - replace with ECB annual averages per year
+CZK,0,0.04,APPROXIMATE default for all years - replace with ECB annual averages per year
+PLN,0,0.23,APPROXIMATE default for all years - replace with ECB annual averages per year
+SEK,0,0.09,APPROXIMATE default for all years - replace with ECB annual averages per year
+DKK,0,0.134,APPROXIMATE default for all years - replace with ECB annual averages per year
+HUF,0,0.0027,APPROXIMATE default for all years - replace with ECB annual averages per year
+RON,0,0.21,APPROXIMATE default for all years - replace with ECB annual averages per year
+BGN,0,0.511,APPROXIMATE default for all years - replace with ECB annual averages per year
+NOK,0,0.09,APPROXIMATE default for all years - replace with ECB annual averages per year
+ISK,0,0.0068,APPROXIMATE default for all years - replace with ECB annual averages per year
+HRK,0,0.133,APPROXIMATE default for all years - replace with ECB annual averages per year

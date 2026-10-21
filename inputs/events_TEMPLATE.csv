@@ -1,0 +1,2 @@
+notice_id,cluster_id,date,regulator,country,peer_id,penalised_party,category,amount_eur,description,source_url,source
+FCA-20160101-Example,SCANDAL-001,2016-01-01,FCA,UNITED KINGDOM,P002,bank,market_manipulation,1000000,example row - delete,https://...,FCA

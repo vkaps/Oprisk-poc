@@ -1,0 +1,5 @@
+region,first_year,last_year,sources_searched
+EU,2013,2025,ESMA register (2010+) and FCA (2013+); complete years only
+UK,2013,2025,FCA fines tables 2013+
+US,2013,2025,FCA and ESMA (fines on EU/UK activity only)
+OTHER,2013,2025,FCA and ESMA (fines on EU/UK activity only)
