@@ -150,6 +150,10 @@ class Net:
                 last = e
                 if e.code not in (429, 500, 502, 503, 504):
                     break
+                if e.code == 429:  # rate limited: wait as long as the server asks (Wikidata: 1/min)
+                    ra = e.headers.get("Retry-After") if e.headers else None
+                    time.sleep(min(int(ra) if ra and str(ra).isdigit() else 65, 180))
+                    continue
             except Exception as e:  # never echo request headers (they hold the contact)
                 last = RuntimeError(type(e).__name__)
             time.sleep(5 * (i + 1))
@@ -299,7 +303,7 @@ def build_wikidata(net, fx, report) -> pd.DataFrame:
     q = WD_QUERY % " ".join(f'"{c}"' for c in WD_COUNTRIES)
     url = WIKIDATA + "?" + urlencode({"query": q, "format": "json"})
     try:
-        rows = json.loads(net.get(url, timeout=180, wikidata=True))["results"]["bindings"]
+        rows = json.loads(net.get(url, timeout=180, wikidata=True, tries=4))["results"]["bindings"]
     except Exception as e:
         log(f"  Wikidata: failed ({e})", report)
         return pd.DataFrame()

@@ -329,6 +329,10 @@ class Severity:
         self.gpd = None
         if len(exc) >= min_tail:
             xi, _, beta = stats.genpareto.fit(exc, floc=0)
+            # fines are capped by law and by the firm's revenue: keep the mean finite
+            if xi > 0.9:
+                xi = 0.9
+                beta = float(np.mean(exc) * (1 - xi))   # refit scale so the mean excess is kept
             self.gpd = (float(xi), float(beta))
         self.p_tail = float(np.mean(x > self.tail_u)) if len(x) else 0.0
 
