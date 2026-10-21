@@ -1,0 +1,337 @@
+peer_id,peer_name,country,region,year,total_assets_eur_bn,size_source,size_imputed
+BAC,Bank of America,US,US,2013,1582.9,SEC,False
+BAC,Bank of America,US,US,2014,1584.14,SEC,False
+BAC,Bank of America,US,US,2015,1932.64,SEC,False
+BAC,Bank of America,US,US,2016,1976.75,SEC,False
+BAC,Bank of America,US,US,2017,2019.36,SEC,False
+BAC,Bank of America,US,US,2018,1993.73,SEC,False
+BAC,Bank of America,US,US,2019,2174.3,SEC,False
+BAC,Bank of America,US,US,2020,2468.6,SEC,False
+BAC,Bank of America,US,US,2021,2679.79,SEC,False
+BAC,Bank of America,US,US,2022,2897.66,SEC,False
+BAC,Bank of America,US,US,2023,2941.13,SEC,False
+BAC,Bank of America,US,US,2024,3013.08,SEC,False
+BAC,Bank of America,US,US,2025,3019.28,SEC,False
+BARC,Barclays,GB,UK,2013,1543.05,SEC,True
+BARC,Barclays,GB,UK,2014,1543.05,SEC,True
+BARC,Barclays,GB,UK,2015,1543.05,SEC,False
+BARC,Barclays,GB,UK,2016,1480.36,SEC,False
+BARC,Barclays,GB,UK,2017,1292.61,SEC,False
+BARC,Barclays,GB,UK,2018,1280.99,SEC,False
+BARC,Barclays,GB,UK,2019,1298.97,SEC,False
+BARC,Barclays,GB,UK,2020,1516.8,SEC,False
+BARC,Barclays,GB,UK,2021,1610.39,SEC,False
+BARC,Barclays,GB,UK,2022,1775.06,SEC,False
+BARC,Barclays,GB,UK,2023,1698.69,SEC,False
+BARC,Barclays,GB,UK,2024,1793.26,SEC,False
+BARC,Barclays,GB,UK,2025,1802.26,SEC,False
+BBVA,BBVA,ES,EU,2013,749.86,SEC,True
+BBVA,BBVA,ES,EU,2014,749.86,SEC,True
+BBVA,BBVA,ES,EU,2015,749.86,SEC,False
+BBVA,BBVA,ES,EU,2016,731.86,SEC,False
+BBVA,BBVA,ES,EU,2017,690.06,SEC,False
+BBVA,BBVA,ES,EU,2018,675.67,SEC,False
+BBVA,BBVA,ES,EU,2019,695.47,SEC,False
+BBVA,BBVA,ES,EU,2020,733.8,SEC,False
+BBVA,BBVA,ES,EU,2021,662.88,SEC,False
+BBVA,BBVA,ES,EU,2022,712.09,SEC,False
+BBVA,BBVA,ES,EU,2023,775.56,SEC,False
+BBVA,BBVA,ES,EU,2024,772.4,SEC,False
+BBVA,BBVA,ES,EU,2025,859.58,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2013,484.45,SEC,True
+BMO,Bank of Montreal,CA,OTHER,2014,484.45,SEC,True
+BMO,Bank of Montreal,CA,OTHER,2015,484.45,SEC,True
+BMO,Bank of Montreal,CA,OTHER,2016,484.45,SEC,True
+BMO,Bank of Montreal,CA,OTHER,2017,484.45,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2018,505.63,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2019,573.68,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2020,620.44,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2021,666.53,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2022,831.84,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2023,922.94,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2024,951.11,SEC,False
+BMO,Bank of Montreal,CA,OTHER,2025,935.44,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2013,624.88,SEC,True
+BNS,Bank of Nova Scotia,CA,OTHER,2014,624.88,SEC,True
+BNS,Bank of Nova Scotia,CA,OTHER,2015,624.88,SEC,True
+BNS,Bank of Nova Scotia,CA,OTHER,2016,624.88,SEC,True
+BNS,Bank of Nova Scotia,CA,OTHER,2017,624.88,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2018,652.88,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2019,731.19,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2020,742.79,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2021,799.18,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2022,985.34,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2023,966.82,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2024,952.71,SEC,False
+BNS,Bank of Nova Scotia,CA,OTHER,2025,924.82,SEC,False
+C,Citigroup,US,US,2013,1415.82,SEC,False
+C,Citigroup,US,US,2014,1386.66,SEC,False
+C,Citigroup,US,US,2015,1560.33,SEC,False
+C,Citigroup,US,US,2016,1619.0,SEC,False
+C,Citigroup,US,US,2017,1630.96,SEC,False
+C,Citigroup,US,US,2018,1623.59,SEC,False
+C,Citigroup,US,US,2019,1742.92,SEC,False
+C,Citigroup,US,US,2020,1978.64,SEC,False
+C,Citigroup,US,US,2021,1937.03,SEC,False
+C,Citigroup,US,US,2022,2295.24,SEC,False
+C,Citigroup,US,US,2023,2230.71,SEC,False
+C,Citigroup,US,US,2024,2173.86,SEC,False
+C,Citigroup,US,US,2025,2351.54,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2013,385.92,SEC,True
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2014,385.92,SEC,True
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2015,385.92,SEC,True
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2016,385.92,SEC,True
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2017,385.92,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2018,390.42,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2019,438.65,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2020,502.98,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2021,565.02,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2022,689.01,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2023,668.52,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2024,703.04,SEC,False
+CM,Canadian Imperial Bank of Commerce,CA,OTHER,2025,707.49,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2013,708.99,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2014,758.64,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2015,768.65,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2016,752.06,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2017,716.3,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2018,665.75,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2019,707.71,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2020,765.01,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2021,699.1,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2022,528.87,SEC,False
+CS,Credit Suisse Group,CH,OTHER,2023,528.87,SEC,True
+DB,Deutsche Bank,DE,EU,2013,1629.13,SEC,True
+DB,Deutsche Bank,DE,EU,2014,1629.13,SEC,True
+DB,Deutsche Bank,DE,EU,2015,1629.13,SEC,False
+DB,Deutsche Bank,DE,EU,2016,1590.55,SEC,False
+DB,Deutsche Bank,DE,EU,2017,1474.73,SEC,False
+DB,Deutsche Bank,DE,EU,2018,1348.14,SEC,False
+DB,Deutsche Bank,DE,EU,2019,1297.67,SEC,False
+DB,Deutsche Bank,DE,EU,2020,1324.96,SEC,False
+DB,Deutsche Bank,DE,EU,2021,1325.0,SEC,False
+DB,Deutsche Bank,DE,EU,2022,1344.0,SEC,False
+DB,Deutsche Bank,DE,EU,2023,1317.0,SEC,False
+DB,Deutsche Bank,DE,EU,2024,1391.0,SEC,False
+DB,Deutsche Bank,DE,EU,2025,1440.0,SEC,False
+GS,Goldman Sachs,US,US,2013,686.03,SEC,False
+GS,Goldman Sachs,US,US,2014,644.22,SEC,False
+GS,Goldman Sachs,US,US,2015,776.37,SEC,False
+GS,Goldman Sachs,US,US,2016,777.09,SEC,False
+GS,Goldman Sachs,US,US,2017,811.54,SEC,False
+GS,Goldman Sachs,US,US,2018,789.02,SEC,False
+GS,Goldman Sachs,US,US,2019,886.99,SEC,False
+GS,Goldman Sachs,US,US,2020,1018.24,SEC,False
+GS,Goldman Sachs,US,US,2021,1237.79,SEC,False
+GS,Goldman Sachs,US,US,2022,1369.17,SEC,False
+GS,Goldman Sachs,US,US,2023,1518.21,SEC,False
+GS,Goldman Sachs,US,US,2024,1548.41,SEC,False
+GS,Goldman Sachs,US,US,2025,1601.19,SEC,False
+HSBC,HSBC Holdings,GB,UK,2013,2171.81,SEC,True
+HSBC,HSBC Holdings,GB,UK,2014,2171.81,SEC,True
+HSBC,HSBC Holdings,GB,UK,2015,2171.81,SEC,False
+HSBC,HSBC Holdings,GB,UK,2016,2145.61,SEC,False
+HSBC,HSBC Holdings,GB,UK,2017,2232.29,SEC,False
+HSBC,HSBC Holdings,GB,UK,2018,2166.15,SEC,False
+HSBC,HSBC Holdings,GB,UK,2019,2425.38,SEC,False
+HSBC,HSBC Holdings,GB,UK,2020,2612.65,SEC,False
+HSBC,HSBC Holdings,GB,UK,2021,2497.41,SEC,False
+HSBC,HSBC Holdings,GB,UK,2022,2800.71,SEC,False
+HSBC,HSBC Holdings,GB,UK,2023,2810.29,SEC,False
+HSBC,HSBC Holdings,GB,UK,2024,2787.42,SEC,False
+HSBC,HSBC Holdings,GB,UK,2025,2861.13,SEC,False
+ING,ING Groep,NL,EU,2013,1002.23,SEC,True
+ING,ING Groep,NL,EU,2014,1002.23,SEC,True
+ING,ING Groep,NL,EU,2015,1002.23,SEC,False
+ING,ING Groep,NL,EU,2016,842.22,SEC,False
+ING,ING Groep,NL,EU,2017,843.88,SEC,False
+ING,ING Groep,NL,EU,2018,884.6,SEC,False
+ING,ING Groep,NL,EU,2019,888.52,SEC,False
+ING,ING Groep,NL,EU,2020,933.89,SEC,False
+ING,ING Groep,NL,EU,2021,949.25,SEC,False
+ING,ING Groep,NL,EU,2022,976.83,SEC,False
+ING,ING Groep,NL,EU,2023,980.3,SEC,False
+ING,ING Groep,NL,EU,2024,1023.86,SEC,False
+ING,ING Groep,NL,EU,2025,1060.33,SEC,False
+JPM,JPMorgan Chase,US,US,2013,1818.27,SEC,False
+JPM,JPMorgan Chase,US,US,2014,1936.22,SEC,False
+JPM,JPMorgan Chase,US,US,2015,2119.58,SEC,False
+JPM,JPMorgan Chase,US,US,2016,2250.4,SEC,False
+JPM,JPMorgan Chase,US,US,2017,2242.76,SEC,False
+JPM,JPMorgan Chase,US,US,2018,2220.69,SEC,False
+JPM,JPMorgan Chase,US,US,2019,2399.77,SEC,False
+JPM,JPMorgan Chase,US,US,2020,2963.38,SEC,False
+JPM,JPMorgan Chase,US,US,2021,3165.16,SEC,False
+JPM,JPMorgan Chase,US,US,2022,3481.08,SEC,False
+JPM,JPMorgan Chase,US,US,2023,3584.12,SEC,False
+JPM,JPMorgan Chase,US,US,2024,3698.16,SEC,False
+JPM,JPMorgan Chase,US,US,2025,3915.9,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2013,997.94,SEC,True
+LLOY,Lloyds Banking Group,GB,UK,2014,997.94,SEC,True
+LLOY,Lloyds Banking Group,GB,UK,2015,997.94,SEC,True
+LLOY,Lloyds Banking Group,GB,UK,2016,997.94,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2017,925.29,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2018,901.54,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2019,950.01,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2020,979.28,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2021,1025.19,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2022,1024.2,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2023,1013.41,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2024,1070.97,SEC,False
+LLOY,Lloyds Banking Group,GB,UK,2025,1101.87,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2013,1355.05,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2014,1355.0,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2015,1442.96,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2016,1667.74,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2017,1611.98,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2018,1515.47,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2019,1731.22,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2020,1819.12,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2021,1782.85,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2022,1802.4,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2023,1790.73,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2024,1688.97,SEC,False
+MIZ,Mizuho Financial Group,JP,OTHER,2025,1744.5,SEC,False
+MS,Morgan Stanley,US,US,2013,626.98,SEC,False
+MS,Morgan Stanley,US,US,2014,603.32,SEC,False
+MS,Morgan Stanley,US,US,2015,709.74,SEC,False
+MS,Morgan Stanley,US,US,2016,736.24,SEC,False
+MS,Morgan Stanley,US,US,2017,753.96,SEC,False
+MS,Morgan Stanley,US,US,2018,722.75,SEC,False
+MS,Morgan Stanley,US,US,2019,799.87,SEC,False
+MS,Morgan Stanley,US,US,2020,976.94,SEC,False
+MS,Morgan Stanley,US,US,2021,1004.57,SEC,False
+MS,Morgan Stanley,US,US,2022,1120.78,SEC,False
+MS,Morgan Stanley,US,US,2023,1103.97,SEC,False
+MS,Morgan Stanley,US,US,2024,1122.59,SEC,False
+MS,Morgan Stanley,US,US,2025,1256.89,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2013,1956.32,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2014,2001.88,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2015,2178.16,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2016,2472.49,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2017,2372.09,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2018,2340.79,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2019,2719.16,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2020,2903.87,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2021,2830.76,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2022,2768.86,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2023,2617.41,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2024,2477.48,SEC,False
+MUFG,Mitsubishi UFJ Financial Group,JP,OTHER,2025,2517.59,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2013,335.64,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2014,297.8,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2015,305.93,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2016,356.52,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2017,318.39,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2018,314.19,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2019,360.64,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2020,348.94,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2021,334.26,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2022,346.1,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2023,362.83,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2024,346.67,SEC,False
+NMR,Nomura Holdings,JP,OTHER,2025,370.59,SEC,False
+NWG,NatWest Group,GB,UK,2013,1123.41,SEC,True
+NWG,NatWest Group,GB,UK,2014,1123.41,SEC,True
+NWG,NatWest Group,GB,UK,2015,1123.41,SEC,False
+NWG,NatWest Group,GB,UK,2016,974.59,SEC,False
+NWG,NatWest Group,GB,UK,2017,841.88,SEC,False
+NWG,NatWest Group,GB,UK,2018,784.71,SEC,False
+NWG,NatWest Group,GB,UK,2019,823.72,SEC,False
+NWG,NatWest Group,GB,UK,2020,898.6,SEC,False
+NWG,NatWest Group,GB,UK,2021,909.71,SEC,False
+NWG,NatWest Group,GB,UK,2022,844.38,SEC,False
+NWG,NatWest Group,GB,UK,2023,796.37,SEC,False
+NWG,NatWest Group,GB,UK,2024,836.25,SEC,False
+NWG,NatWest Group,GB,UK,2025,833.99,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2013,828.04,SEC,True
+RY,Royal Bank of Canada,CA,OTHER,2014,828.04,SEC,True
+RY,Royal Bank of Canada,CA,OTHER,2015,828.04,SEC,True
+RY,Royal Bank of Canada,CA,OTHER,2016,828.04,SEC,True
+RY,Royal Bank of Canada,CA,OTHER,2017,828.04,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2018,872.74,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2019,961.94,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2020,1061.8,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2021,1150.92,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2022,1399.95,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2023,1374.84,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2024,1465.2,SEC,False
+RY,Royal Bank of Canada,CA,OTHER,2025,1472.71,SEC,False
+SAN,Banco Santander,ES,EU,2013,1340.26,SEC,True
+SAN,Banco Santander,ES,EU,2014,1340.26,SEC,True
+SAN,Banco Santander,ES,EU,2015,1340.26,SEC,False
+SAN,Banco Santander,ES,EU,2016,1339.12,SEC,False
+SAN,Banco Santander,ES,EU,2017,1443.07,SEC,False
+SAN,Banco Santander,ES,EU,2018,1459.27,SEC,False
+SAN,Banco Santander,ES,EU,2019,1522.69,SEC,False
+SAN,Banco Santander,ES,EU,2020,1508.25,SEC,False
+SAN,Banco Santander,ES,EU,2021,1595.84,SEC,False
+SAN,Banco Santander,ES,EU,2022,1734.66,SEC,False
+SAN,Banco Santander,ES,EU,2023,1797.06,SEC,False
+SAN,Banco Santander,ES,EU,2024,1837.08,SEC,False
+SAN,Banco Santander,ES,EU,2025,1867.52,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2013,1590.32,SEC,True
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2014,1590.32,SEC,True
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2015,1590.32,SEC,True
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2016,1590.32,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2017,1516.64,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2018,1499.31,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2019,1738.92,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2020,1928.87,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2021,1910.74,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2022,1866.93,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2023,1850.59,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2024,1783.1,SEC,False
+SMFG,Sumitomo Mitsui Financial Group,JP,OTHER,2025,1783.1,SEC,True
+STT,State Street,US,US,2013,183.18,SEC,False
+STT,State Street,US,US,2014,206.34,SEC,False
+STT,State Street,US,US,2015,220.96,SEC,False
+STT,State Street,US,US,2016,219.26,SEC,False
+STT,State Street,US,US,2017,211.06,SEC,False
+STT,State Street,US,US,2018,207.12,SEC,False
+STT,State Street,US,US,2019,219.4,SEC,False
+STT,State Street,US,US,2020,275.53,SEC,False
+STT,State Street,US,US,2021,266.01,SEC,False
+STT,State Street,US,US,2022,286.26,SEC,False
+STT,State Street,US,US,2023,274.92,SEC,False
+STT,State Street,US,US,2024,326.35,SEC,False
+STT,State Street,US,US,2025,323.94,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2013,802.91,SEC,True
+TD,Toronto-Dominion Bank,CA,OTHER,2014,802.91,SEC,True
+TD,Toronto-Dominion Bank,CA,OTHER,2015,802.91,SEC,True
+TD,Toronto-Dominion Bank,CA,OTHER,2016,802.91,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2017,873.2,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2018,872.85,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2019,952.75,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2020,1121.49,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2021,1166.0,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2022,1400.18,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2023,1339.62,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2024,1391.09,SEC,False
+TD,Toronto-Dominion Bank,CA,OTHER,2025,1326.74,SEC,False
+UBS,UBS Group,CH,OTHER,2013,882.91,SEC,True
+UBS,UBS Group,CH,OTHER,2014,882.91,SEC,True
+UBS,UBS Group,CH,OTHER,2015,882.91,SEC,False
+UBS,UBS Group,CH,OTHER,2016,830.16,SEC,False
+UBS,UBS Group,CH,OTHER,2017,831.03,SEC,False
+UBS,UBS Group,CH,OTHER,2018,811.63,SEC,False
+UBS,UBS Group,CH,OTHER,2019,868.44,SEC,False
+UBS,UBS Group,CH,OTHER,2020,985.61,SEC,False
+UBS,UBS Group,CH,OTHER,2021,944.57,SEC,False
+UBS,UBS Group,CH,OTHER,2022,1048.73,SEC,False
+UBS,UBS Group,CH,OTHER,2023,1587.88,SEC,False
+UBS,UBS Group,CH,OTHER,2024,1445.91,SEC,False
+UBS,UBS Group,CH,OTHER,2025,1431.37,SEC,False
+WFC,Wells Fargo,US,US,2013,1147.11,SEC,False
+WFC,Wells Fargo,US,US,2014,1269.97,SEC,False
+WFC,Wells Fargo,US,US,2015,1611.19,SEC,False
+WFC,Wells Fargo,US,US,2016,1743.71,SEC,False
+WFC,Wells Fargo,US,US,2017,1727.71,SEC,False
+WFC,Wells Fargo,US,US,2018,1605.38,SEC,False
+WFC,Wells Fargo,US,US,2019,1721.84,SEC,False
+WFC,Wells Fargo,US,US,2020,1709.79,SEC,False
+WFC,Wells Fargo,US,US,2021,1647.08,SEC,False
+WFC,Wells Fargo,US,US,2022,1786.26,SEC,False
+WFC,Wells Fargo,US,US,2023,1787.22,SEC,False
+WFC,Wells Fargo,US,US,2024,1782.96,SEC,False
+WFC,Wells Fargo,US,US,2025,1901.47,SEC,False

@@ -1,0 +1,27 @@
+peer_id,alias_regex
+NWG,natwest|national westminster|royal bank of scotland|\brbs\b|ulster bank
+LLOY,lloyds|(?<!royal )bank of scotland|halifax
+HSBC,\bhsbc\b
+BARC,barclays
+JPM,j\.? ?p\.? ?morgan|chase bank
+BAC,bank of america|merrill lynch
+C,\bciti(bank|group|corp)?\b
+WFC,wells fargo
+GS,goldman sachs
+MS,morgan stanley
+STT,state street
+UBS,\bubs\b
+CS,credit suisse
+MUFG,mitsubishi ufj|\bmufg\b
+MIZ,mizuho
+SMFG,sumitomo mitsui|\bsmbc\b
+NMR,nomura
+RY,royal bank of canada|rbc (capital|europe)
+TD,toronto.dominion|\btd (bank|securities)
+BMO,bank of montreal|\bbmo\b
+BNS,bank of nova scotia|scotiabank
+CM,canadian imperial|\bcibc\b
+DB,deutsche bank
+SAN,santander
+BBVA,\bbbva\b|bilbao vizcaya
+ING,\bing (groep|bank)\b

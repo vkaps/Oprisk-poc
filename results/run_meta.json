@@ -1,0 +1,28 @@
+{
+ "run_utc": "2026-10-21T14:03:35",
+ "data_mode": "REAL",
+ "target_year": 2026,
+ "target_size_eur_bn": 86.314,
+ "bank_region": "EU",
+ "n_banks": 26,
+ "n_bank_years": 336,
+ "n_banks_no_event": 18,
+ "n_events": 13,
+ "events_by_cell": {
+  "B1": 9,
+  "B2": 3,
+  "A1": 1
+ },
+ "banks_by_region": {
+  "EU": 4,
+  "OTHER": 11,
+  "UK": 4,
+  "US": 7
+ },
+ "years": [
+  2013,
+  2025
+ ],
+ "size_elasticity": -0.24614763346692792,
+ "internal_years": 16
+}

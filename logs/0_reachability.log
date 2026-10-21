@@ -1,0 +1,5 @@
+502 https://www.eba.europa.eu/assets/TE2024/Full_database/256109/TR_Metadata.xlsx
+502 https://www.eba.europa.eu/
+302 https://data-api.ecb.europa.eu/
+403 https://www.sec.gov/
+200 https://api.gleif.org/api/v1/lei-records?page%5Bsize%5D=1
