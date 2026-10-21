@@ -264,6 +264,16 @@ def bayes_update(mu_hist: np.ndarray, n_hist: int, mu_next: float, r: float) -> 
 # ---------------------------------------------------------------------------
 # 6. Severity
 # ---------------------------------------------------------------------------
+ELASTICITY_PRIOR = 0.25   # literature range for op-loss severity vs size (Shih et al.; Dahen & Dionne)
+
+
+def size_elasticity_used(est: float, se: float, n: int, min_n: int = 20) -> tuple[float, str]:
+    """Use the estimate only with enough amounts and a plausible value (0-1)."""
+    if n >= min_n and np.isfinite(est) and 0 <= est <= 1:
+        return est, "estimated"
+    return ELASTICITY_PRIOR, f"literature value (estimate {est:.2f} from {n} amounts not reliable)"
+
+
 def size_elasticity(events: pd.DataFrame, panel: pd.DataFrame) -> tuple[float, float]:
     """OLS slope of log(amount) on log(size of fined/employer bank), with cell
     fixed effects (pooled slope: few events per cell). Returns (slope, std err)."""
@@ -290,11 +300,10 @@ def severity_sample(scaled: pd.DataFrame, cell: str, min_n: int = 8) -> tuple[np
     x = scaled.loc[scaled["cell"].isin(MEMBERS[cell]), "amount_scaled_eur"].dropna().values
     if len(x) >= min_n:
         return x, "own"
+    # pool only with the same party: a fine on a person is not comparable to one on a bank
     party = cell[-1]
     x = scaled.loc[scaled["cell"].str.endswith(party), "amount_scaled_eur"].dropna().values
-    if len(x) >= min_n:
-        return x, f"pooled ({'bank' if party == '1' else 'employee'} cells)"
-    return scaled["amount_scaled_eur"].dropna().values, "pooled (all cells)"
+    return x, f"pooled ({'bank' if party == '1' else 'employee'} cells, {len(x)} amounts)"
 
 
 def scale_amounts(events: pd.DataFrame, panel: pd.DataFrame, bank_size: float,

@@ -285,10 +285,12 @@ def build_eba(net, report):
 WIKIDATA = "https://query.wikidata.org/sparql"
 WD_QUERY = """
 SELECT ?bank ?bankLabel ?lei ?cc ?date ?amount ?ccy WHERE {
+  hint:Query hint:optimizer "None" .
   ?bank p:P2403 ?st .
   ?st ps:P2403 ?amount ; pq:P585 ?date .
+  ?bank wdt:P31 ?type .
+  ?type wdt:P279? wd:Q22687 .
   OPTIONAL { ?st psv:P2403/wikibase:quantityUnit/wdt:P498 ?ccy . }
-  ?bank wdt:P31/wdt:P279* wd:Q22687 .
   ?bank wdt:P17/wdt:P297 ?cc .
   VALUES ?cc { %s }
   OPTIONAL { ?bank wdt:P1278 ?lei . }
