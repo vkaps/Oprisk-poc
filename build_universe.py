@@ -585,6 +585,18 @@ def main():
     fx = build_fx(net, report)
     log("2/5 EBA transparency exercise (EU/EEA banks) ...", report)
     eba_sizes, eba_meta = build_eba(net, report)
+    # The EBA site blocks cloud servers. A run from a normal connection (your laptop)
+    # saves the extracted sizes here; cloud runs then reuse them.
+    cache_s, cache_m = DATA / "eba_sizes.csv", DATA / "eba_meta.csv"
+    if eba_sizes["lei"].nunique() >= 50:
+        eba_sizes.to_csv(cache_s, index=False)
+        eba_meta.to_csv(cache_m, index=False)
+        log(f"  EBA: saved {eba_sizes.lei.nunique()} banks to {cache_s.name} for future cloud runs", report)
+    elif cache_s.exists():
+        eba_sizes = pd.read_csv(cache_s, dtype={"lei": str})
+        eba_meta = pd.read_csv(cache_m, dtype={"lei": str}) if cache_m.exists() else eba_meta
+        log(f"  EBA: site unreachable - using saved copy ({eba_sizes.lei.nunique()} banks, "
+            f"{eba_sizes.year.min()}-{eba_sizes.year.max()})", report)
     log("3/5 SEC filings (US, CH, JP, CA, UK and EU ADRs) ...", report)
     sec = build_sec(net, fx, report)
     wiki = None

@@ -37,6 +37,17 @@ jupyter notebook OpRisk_PoC.ipynb      # or open it in VS Code / PyCharm
 ```
 Run all cells. `DATA_MODE = "DEMO"` uses synthetic data – figures are illustrative only.
 
+## Run everything on your laptop (one command)
+
+```
+git clone https://github.com/vkaps/Oprisk-poc.git      # first time only; later: git pull
+cd Oprisk-poc
+py -m pip install pandas numpy scipy matplotlib openpyxl nbconvert ipykernel   # first time only
+py -u run_all.py --sec-contact "Your Name your@email"
+git add -A && git commit -m "Laptop run" && git push     # lets the cloud reuse the EBA bank sizes
+```
+The EBA site blocks cloud servers but works from a normal connection, so a laptop run is what fills the European bank universe. It saves the bank sizes to `data/eba_sizes.csv`; after the push, every cloud run reuses them.
+
 ## Real data – the run order
 
 1. **Your bank** – edit `inputs/bank_profile.csv` (year, total assets EUR bn, internal events per cell). No name anywhere.

@@ -422,3 +422,62 @@ def loss_summary(losses: np.ndarray, levels=(0.95, 0.99, 0.999)) -> dict:
     for q in levels:
         d[f"VaR_{q:.1%}_eur"] = float(np.quantile(losses, q))
     return d
+
+
+# ---------------------------------------------------------------------------
+# Why negative binomial: Poisson vs NB on the same covariates (no priors)
+# ---------------------------------------------------------------------------
+def nb_vs_poisson(counts: pd.DataFrame, regions: list[str], kmax: int = 4) -> dict:
+    """Fits Poisson and NB2 by plain maximum likelihood with the same regime and
+    region terms, then compares
+      * the likelihood ratio test for extra spread (alpha = 0 is on the boundary,
+        so the p-value is half the chi-square(1) tail);
+      * how many banks had 0, 1, 2, ... events in the sample against what each
+        model expects (bank totals: Poisson, or Gamma-mixed Poisson = NB)."""
+    d = counts
+    present_p = [p for p, *_ in PERIODS if (d["period"] == p).any()]
+    present_r = [r for r in regions if (d["region"] == r).any()]
+    X = np.column_stack([np.ones(len(d))] + [(d["period"] == p).astype(float).values for p in present_p[1:]]
+                        + [(d["region"] == r).astype(float).values for r in present_r[1:]])
+    y = d["n"].values.astype(float)
+    k = X.shape[1]
+
+    def nll_p(b):
+        mu = np.exp(np.clip(X @ b, -30, 30))
+        return -(y * np.log(mu) - mu - gammaln(y + 1)).sum()
+
+    def nll_nb(t):
+        b, a = t[:k], np.exp(t[k])
+        mu = np.exp(np.clip(X @ b, -30, 30))
+        inv = 1.0 / a
+        return -(gammaln(y + inv) - gammaln(inv) - gammaln(y + 1)
+                 + inv * np.log(inv / (inv + mu)) + y * np.log(mu / (inv + mu))).sum()
+
+    b0 = np.zeros(k)
+    b0[0] = np.log(max(y.mean(), 1e-4))
+    rp = optimize.minimize(nll_p, b0, method="BFGS")
+    best = None
+    for la in (-4.0, -1.0, 0.5, 2.0):   # several starts: the NB likelihood is flat in alpha
+        r_ = optimize.minimize(nll_nb, np.r_[rp.x, la], method="Nelder-Mead",
+                               options={"maxiter": 40000, "xatol": 1e-8, "fatol": 1e-10})
+        if best is None or r_.fun < best.fun:
+            best = r_
+    alpha = float(np.exp(best.x[k]))
+    lr = max(0.0, 2 * (rp.fun - best.fun))
+    p = 0.5 * stats.chi2.sf(lr, 1) if lr > 0 else 0.5
+
+    mu_p = np.exp(X @ rp.x)
+    mu_nb = np.exp(X @ best.x[:k])
+    exp_p = pd.Series(mu_p, index=d.index).groupby(d["peer_id"]).sum()
+    exp_nb = pd.Series(mu_nb, index=d.index).groupby(d["peer_id"]).sum()
+    tot = d.groupby("peer_id")["n"].sum().reindex(exp_p.index)
+    ks = np.arange(kmax + 1)
+    obs = [int((tot == j).sum()) if j < kmax else int((tot >= j).sum()) for j in ks]
+    pois = [float(stats.poisson.pmf(j, exp_p).sum()) if j < kmax else float(stats.poisson.sf(j - 1, exp_p).sum()) for j in ks]
+    r = 1.0 / max(alpha, 1e-6)
+    pr = r / (r + exp_nb)
+    nbe = [float(stats.nbinom.pmf(j, r, pr).sum()) if j < kmax else float(stats.nbinom.sf(j - 1, r, pr).sum()) for j in ks]
+    return {"loglik_poisson": float(-rp.fun), "loglik_nb": float(-best.fun), "alpha_mle": alpha,
+            "lr_stat": float(lr), "p_value": float(p), "k": [int(j) for j in ks], "banks_observed": obs,
+            "banks_poisson": pois, "banks_nb": nbe, "n_banks": int(len(tot)), "n_events": int(y.sum()),
+            "top_banks": tot.sort_values(ascending=False).head(5).astype(int).to_dict()}
