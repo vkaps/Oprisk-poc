@@ -1,6 +1,104 @@
 [NbConvertApp] Converting notebook OpRisk_PoC.ipynb to notebook
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
-[NbConvertApp] Writing 286035 bytes to OpRisk_PoC_executed.ipynb
-[NbConvertApp] Converting notebook OpRisk_PoC_executed.ipynb to html
-[NbConvertApp] WARNING | Alternative text is missing on 4 image(s).
-[NbConvertApp] Writing 612058 bytes to results/OpRisk_PoC_executed.html
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/traitlets/config/application.py", line 1080, in launch_instance
+    app.start()
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+elast_est, elast_se = ore.size_elasticity(events, panel)
+n_amounts = int(events.amount_eur.notna().sum())
+elast, elast_note = ore.size_elasticity_used(elast_est, elast_se, n_amounts)
+print(f"Size elasticity of fine amounts used: {elast:.2f} - {elast_note}")
+scaled = ore.scale_amounts(events, panel, TARGET_SIZE, elast)
+sev, sev_src = {}, {}
+for c in ore.CELLS:
+    x, src = ore.severity_sample(scaled, c)
+    if len(x) >= 3:
+        # truncate at the smallest amount only when there are enough amounts to see it
+        sev[c], sev_src[c] = ore.Severity(x, float(np.min(x)) if len(x) >= 20 else 1.0), src
+        sev[c].p_zero, z, k = ore.share_without_fine(events, c)
+        if z:
+            sev_src[c] += f"; {z} of {k} events had no fine"
+desc = pd.DataFrame({c: {**s.describe(), "amounts_from": sev_src[c]} for c, s in sev.items()}).T
+desc
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mLinAlgError[39m                               Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[12][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m elast_est, elast_se = ore.size_elasticity(events, panel)
+[32m      2[39m n_amounts = int(events.amount_eur.notna().sum())
+[32m      3[39m elast, elast_note = ore.size_elasticity_used(elast_est, elast_se, n_amounts)
+[32m      4[39m print(f"Size elasticity of fine amounts used: {elast:.2f} - {elast_note}")
+
+[36mFile [39m[32m~/work/Oprisk-poc/Oprisk-poc/oprisk_engine.py:295[39m, in [36msize_elasticity[39m[34m(events, panel)[39m
+[32m    293[39m     X.append((e[[33m"[39m[33mcell[39m[33m"[39m] == c).astype([38;5;28mfloat[39m).values)
+[32m    294[39m X = np.column_stack([np.ones([38;5;28mlen[39m(e))] + X)
+[32m--> [39m[32m295[39m beta, *_ = [30;43mnp[39;49m[30;43m.[39;49m[30;43mlinalg[39;49m[30;43m.[39;49m[30;43mlstsq[39;49m[30;43m([39;49m[30;43mX[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43my[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mrcond[39;49m[30;43m=[39;49m[30;43;01mNone[39;49;00m[30;43m)[39;49m
+[32m    296[39m resid = y - X @ beta
+[32m    297[39m s2 = resid @ resid / [38;5;28mmax[39m([38;5;28mlen[39m(y) - X.shape[[32m1[39m], [32m1[39m)
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2556[39m, in [36mlstsq[39m[34m(a, b, rcond)[39m
+[32m   2552[39m     b = zeros(b.shape[:-[32m2[39m] + (m, n_rhs + [32m1[39m), dtype=b.dtype)
+[32m   2554[39m [38;5;28;01mwith[39;00m errstate(call=_raise_linalgerror_lstsq, invalid=[33m'[39m[33mcall[39m[33m'[39m,
+[32m   2555[39m               over=[33m'[39m[33mignore[39m[33m'[39m, divide=[33m'[39m[33mignore[39m[33m'[39m, under=[33m'[39m[33mignore[39m[33m'[39m):
+[32m-> [39m[32m2556[39m     x, resids, rank, s = [30;43m_umath_linalg[39;49m[30;43m.[39;49m[30;43mlstsq[39;49m[30;43m([39;49m[30;43ma[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mb[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mrcond[39;49m[30;43m,[39;49m
+[32m   2557[39m [30;43m                                             [39;49m[30;43msignature[39;49m[30;43m=[39;49m[30;43msignature[39;49m[30;43m)[39;49m
+[32m   2558[39m [38;5;28;01mif[39;00m m == [32m0[39m:
+[32m   2559[39m     x[...] = [32m0[39m
+
+[36mFile [39m[32m/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/numpy/linalg/_linalg.py:156[39m, in [36m_raise_linalgerror_lstsq[39m[34m(err, flag)[39m
+[32m    155[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34m_raise_linalgerror_lstsq[39m(err, flag):
+[32m--> [39m[32m156[39m     [38;5;28;01mraise[39;00m LinAlgError([33m"[39m[33mSVD did not converge in Linear Least Squares[39m[33m"[39m)
+
+[31mLinAlgError[39m: SVD did not converge in Linear Least Squares
+
