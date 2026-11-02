@@ -24,14 +24,14 @@ FX = {
     "USD": {},
     "GBP": {1995: 1.58, 1996: 1.56, 1997: 1.64, 2010: 1.55, 2012: 1.58, 2013: 1.56, 2014: 1.65, 2015: 1.53,
             2016: 1.36, 2017: 1.29, 2018: 1.34, 2019: 1.28, 2020: 1.28, 2022: 1.24, 2023: 1.24, 2024: 1.28, 2025: 1.30},
-    "EUR": {2004: 1.24, 2006: 1.26, 2007: 1.37, 2008: 1.47, 2015: 1.11, 2016: 1.11, 2018: 1.18},
+    "EUR": {2004: 1.24, 2006: 1.26, 2007: 1.37, 2008: 1.47, 2015: 1.11, 2016: 1.11, 2018: 1.18, 2020: 1.14, 2021: 1.18, 2022: 1.05},
     "JPY": {1993: 1 / 111, 1994: 1 / 102, 1996: 1 / 109, 2005: 1 / 110},
     "CAD": {2007: 0.93},
     "SEK": {2010: 0.139},
     "SGD": {2020: 0.725},
     "CNY": {2013: 0.161},
     "KRW": {2023: 0.00077, 2024: 0.00073},
-    "HKD": {2008: 0.128, 2019: 0.1276},
+    "HKD": {2008: 0.128, 2018: 0.1276, 2019: 0.1276},
     "AUD": {2004: 0.74, 2022: 0.69, 2025: 0.645},
     "INR": {2019: 0.0142},
 }
@@ -601,7 +601,8 @@ FAMILY = {  # scenario families used for scenario workshops
     "Market access controls": "Trading & settlement controls", "Short-selling borrow controls": "Trading & settlement controls",
     "Trading venue controls": "Trading & settlement controls", "Platform outages and controls": "Payments, settlement & IT",
     "Customer protection / segregation": "Client money & custody",
-    "Settlement system project failure": "Payments, settlement & IT", "Conflicts in fund trading": "Trading conduct & client pricing",
+    "Settlement system project failure": "Payments, settlement & IT",
+    "Trade booking controls": "Trading & settlement controls", "Conflicts in fund trading": "Trading conduct & client pricing",
 }
 
 
@@ -613,7 +614,7 @@ OFFICIAL_DOMAINS = ("fca.org.uk", "sec.gov", "cftc.gov", "justice.gov", "federal
                     "mas.gov.sg", "newyorkfed.org", "ic3.gov", "fbi.gov", "gov.uk", "fi.se", "police.gov.sg",
                     "jpx.co.jp", "mtgox.com", "nomuraholdings.com", "morganstanley.com", "ubs.com", "mufg.jp",
                     "mitsubishicorp.com", "credit-agricole.com", "nab.com.au", "ris.bka.gv.at", "coincheck.com", "asic.gov.au",
-                    "asx.com.au", "nseindia.com", "fsc.go.kr", "finra.org",
+                    "asx.com.au", "nseindia.com", "fsc.go.kr", "finra.org", "bafin.de", "centralbank.ie", "amf-france.org",
                     "sse.com.cn", "tsb.co.uk")
 OFFICIAL = {
     "BM02": "https://www.cftc.gov/PressRoom/PressReleases/6472-12",
@@ -666,7 +667,7 @@ OFFICIAL = {
     "RT11": "https://www.ris.bka.gv.at/Dokument.wxe?Abfrage=Justiz&Dokumentnummer=JJT_20101223_OGH0002_0140OS00143_09Z0000_000",
 }
 
-HEAD = ["event_id", "announced", "year", "firm", "firm_type", "country", "region", "back_office_control_failure", "scenario_family", "archetype", "basel_event_type",
+HEAD = ["event_id", "announced", "year", "firm", "firm_type", "country", "region", "back_office_control_failure", "loss_band", "scenario_family", "archetype", "basel_event_type",
         "business_line", "what_happened", "loss_orig_m", "currency", "loss_usd_m", "loss_components",
         "near_miss", "exposure_usd_m", "years_undetected", "control_failure", "internal_fraud", "source_database", "source_1", "source_2", "official_source", "confidence"]
 
@@ -723,25 +724,39 @@ def source_db(eid, off):
                       ("sfc.hk", "Hong Kong SFC"), ("mas.gov.sg", "MAS"), ("fi.se", "Finansinspektionen"),
                       ("fbi.gov", "FBI"), ("ic3.gov", "FBI"), ("newyorkfed", "New York Fed"), ("gov.uk", "UK government"),
                       ("police.gov.sg", "Singapore Police"), ("ris.bka.gv.at", "Austrian courts"), ("asic.gov.au", "ASIC"), ("asx.com.au", "company disclosure"),
-                      ("nseindia.com", "company disclosure")):
+                      ("nseindia.com", "company disclosure"), ("bafin.de", "BaFin"), ("centralbank.ie", "Central Bank of Ireland"),
+                      ("amf-france.org", "AMF")):
         if key in off:
             return name
     return "company disclosure"
 
 
+THRESHOLD_USD_M = 1.0
+
+
+def loss_band(loss, expo):
+    v = loss if loss is not None else expo
+    if v is None:
+        return "unknown"
+    return "$1bn+" if v >= 1000 else "$100m-1bn" if v >= 100 else "$10-100m" if v >= 10 else "$1-10m"
+
+
 def main(out=Path(__file__).with_name("extreme_events.csv")):
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    from tier2_events import TIER2
     rows = []
-    for r in ROWS:
+    for r in ROWS + TIER2:
         (eid, ann, firm, ftype, ctry, arch, basel, bl, what, amt, ccy, comp, nm, expo, lag, ctrl, s1, s2, conf) = r
         y = int(ann[:4])
         loss = usd(amt, ccy, y)
-        if loss is not None and loss < 10 and nm != "Y":
-            raise ValueError(f"{eid} below USD 10m: {loss}")
+        if loss is not None and loss < THRESHOLD_USD_M and nm != "Y":
+            raise ValueError(f"{eid} below USD {THRESHOLD_USD_M}m: {loss}")
         off = OFFICIAL.get(eid) or next((u for u in (s1, s2) if u and any(d in u for d in OFFICIAL_DOMAINS)), "")
-        rows.append([eid, ann, y, firm, ftype, ctry, region_of(ctry), back_office_flag(eid, FAMILY[arch], ctrl, what), FAMILY[arch], arch, basel, bl, what, amt, ccy, loss, comp, nm, expo,
+        rows.append([eid, ann, y, firm, ftype, ctry, region_of(ctry), back_office_flag(eid, FAMILY[arch], ctrl, what), loss_band(loss, expo), FAMILY[arch], arch, basel, bl, what, amt, ccy, loss, comp, nm, expo,
                      lag, ctrl, "Y" if (basel == "Internal fraud" or eid == "OD07") else "N", source_db(eid, off),
                      s1, s2, off or "none located", conf])
-    rows.sort(key=lambda x: (x[8], x[1]))
+    rows.sort(key=lambda x: (x[9], x[1]))
     with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(HEAD)
