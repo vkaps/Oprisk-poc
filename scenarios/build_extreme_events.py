@@ -27,12 +27,13 @@ FX = {
     "EUR": {2004: 1.24, 2006: 1.26, 2007: 1.37, 2008: 1.47, 2015: 1.11, 2016: 1.11, 2018: 1.18},
     "JPY": {1993: 1 / 111, 1994: 1 / 102, 1996: 1 / 109, 2005: 1 / 110},
     "CAD": {2007: 0.93},
-    "AUD": {2004: 0.74},
-    "HKD": {2008: 0.128},
     "SEK": {2010: 0.139},
     "SGD": {2020: 0.725},
     "CNY": {2013: 0.161},
-    "KRW": {2023: 0.00077},
+    "KRW": {2023: 0.00077, 2024: 0.00073},
+    "HKD": {2008: 0.128, 2019: 0.1276},
+    "AUD": {2004: 0.74, 2022: 0.69, 2025: 0.645},
+    "INR": {2019: 0.0142},
 }
 
 
@@ -550,6 +551,28 @@ ROWS = [
  "IPO cross design flaw delayed confirmations for the Facebook IPO; SEC penalty $10m and $62m member compensation plan.", 72, "USD",
  "penalty 10 + compensation 62", "N", None, 0, "Untested system limits for an exceptional IPO",
  "https://www.sec.gov/files/litigation/admin/2013/34-69655.pdf", "", "High"),
+("AP01", "2019-12", "UBS (Hong Kong)", "bank", "Hong Kong", "Client overcharging", "Execution, delivery & process management", "Agency Services",
+ "Overcharged clients on bond and structured-product trades (2008-2017) through undisclosed spreads; SFC fine HK$400m plus ~US$25.2m compensation.", 400, "HKD",
+ "regulatory fine (compensation of ~US$25m not included)", "N", None, 9, "Pricing and billing controls; no check of charges against client agreements",
+ "https://apps.sfc.hk/edistributionWeb/gateway/EN/news-and-announcements/news/doc?refNo=19PR111", "", "High"),
+("AP02", "2024-07", "Credit Suisse AG and Credit Suisse Singapore", "bank", "Switzerland/South Korea", "Short-selling borrow controls", "Execution, delivery & process management", "Trading & Sales",
+ "Naked short selling in Korean stocks 2021-2022; FSC penalty surcharges KRW 27.17bn.", 27173, "KRW",
+ "regulatory penalties", "N", None, 1, "No pre-trade check that shares were borrowed",
+ "https://www.fsc.go.kr/eng/pr010101/82597", "", "High"),
+("AP03", "2025-12", "Macquarie Securities (Australia)", "broker-dealer", "Australia", "Transaction reporting failure", "Execution, delivery & process management", "Trading & Sales",
+ "Misreported at least 73m short sales (ASIC estimate up to 1.5bn) from 2009 to 2024 through system and process failures; agreed A$35m penalty awaiting court approval.", 35, "AUD",
+ "proposed civil penalty (court approval pending)", "N", None, 14, "Short-sale flagging logic and reporting reconciliations",
+ "https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2025-releases/25-311mr-macquarie-securities-admits-to-misleading-conduct-and-agrees-to-pay-35-million-for-systemic-failures", "", "High"),
+("AP04", "2022-11", "ASX (CHESS replacement)", "market infrastructure", "Australia", "Settlement system project failure", "Execution, delivery & process management", "Payment & Settlement",
+ "Clearing and settlement system replacement paused; A$245-255m written off. In 2026 ASX admitted misleading the market on progress (proposed A$20.5m penalty + A$3m costs).", 273.5, "AUD",
+ "write-off ~250 + proposed penalty and costs 23.5", "N", None, 2, "Programme governance; status reporting did not reflect red internal ratings",
+ "https://www.asx.com.au/content/dam/asx/about/media-releases/2022/60-17-november-2022-CHESS-Replacement-ASX-reassessing-financial-derecognition_.pdf",
+ "https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2026-releases/26-119mr-asx-admits-misleading-conduct-relating-to-chess-replacement-project", "High"),
+("AP05", "2019-04", "National Stock Exchange of India (co-location)", "market infrastructure", "India", "Trading venue controls", "Execution, delivery & process management", "Trading & Sales",
+ "Co-location architecture let some brokers connect first and see data earlier; SEBI ordered disgorgement of INR 625 crore (2019), later reduced on appeal and settled.", 6250, "INR",
+ "disgorgement ordered (later varied on appeal)", "N", None, 4, "Fair-access controls on co-location and data dissemination",
+ "https://nsearchives.nseindia.com/web/sites/default/files/inline-files/SAT%20Order-23012023%20Announcement_1.pdf",
+ "https://www.business-standard.com/amp/article/markets/sebi-bars-nse-from-securities-market-for-6-months-119043001307_1.html", "Medium"),
 ]
 
 FAMILY = {  # scenario families used for scenario workshops
@@ -577,7 +600,8 @@ FAMILY = {  # scenario families used for scenario workshops
     "Fictitious trades undetected": "Rogue trading & concealment",
     "Market access controls": "Trading & settlement controls", "Short-selling borrow controls": "Trading & settlement controls",
     "Trading venue controls": "Trading & settlement controls", "Platform outages and controls": "Payments, settlement & IT",
-    "Customer protection / segregation": "Client money & custody", "Conflicts in fund trading": "Trading conduct & client pricing",
+    "Customer protection / segregation": "Client money & custody",
+    "Settlement system project failure": "Payments, settlement & IT", "Conflicts in fund trading": "Trading conduct & client pricing",
 }
 
 
@@ -588,7 +612,8 @@ OFFICIAL_DOMAINS = ("fca.org.uk", "sec.gov", "cftc.gov", "justice.gov", "federal
                     "finma.ch", "occ.gov", "apra.gov.au", "societegenerale.com", "fsa.go.jp", "csrc.gov.cn", "sfc.hk",
                     "mas.gov.sg", "newyorkfed.org", "ic3.gov", "fbi.gov", "gov.uk", "fi.se", "police.gov.sg",
                     "jpx.co.jp", "mtgox.com", "nomuraholdings.com", "morganstanley.com", "ubs.com", "mufg.jp",
-                    "mitsubishicorp.com", "credit-agricole.com", "nab.com.au", "ris.bka.gv.at", "coincheck.com",
+                    "mitsubishicorp.com", "credit-agricole.com", "nab.com.au", "ris.bka.gv.at", "coincheck.com", "asic.gov.au",
+                    "asx.com.au", "nseindia.com", "fsc.go.kr", "finra.org",
                     "sse.com.cn", "tsb.co.uk")
 OFFICIAL = {
     "BM02": "https://www.cftc.gov/PressRoom/PressReleases/6472-12",
@@ -641,9 +666,50 @@ OFFICIAL = {
     "RT11": "https://www.ris.bka.gv.at/Dokument.wxe?Abfrage=Justiz&Dokumentnummer=JJT_20101223_OGH0002_0140OS00143_09Z0000_000",
 }
 
-HEAD = ["event_id", "announced", "year", "firm", "firm_type", "country", "scenario_family", "archetype", "basel_event_type",
+HEAD = ["event_id", "announced", "year", "firm", "firm_type", "country", "region", "back_office_control_failure", "scenario_family", "archetype", "basel_event_type",
         "business_line", "what_happened", "loss_orig_m", "currency", "loss_usd_m", "loss_components",
         "near_miss", "exposure_usd_m", "years_undetected", "control_failure", "internal_fraud", "source_database", "source_1", "source_2", "official_source", "confidence"]
+
+
+REGION = {
+    "UK": "Europe", "France": "Europe", "Germany": "Europe", "Switzerland": "Europe", "Ireland": "Europe",
+    "Netherlands": "Europe", "Austria": "Europe", "Sweden": "Europe", "Croatia": "Europe", "UK/Ireland": "Europe",
+    "US": "Americas", "Canada": "Americas", "Chile": "Americas",
+    "Japan": "Asia-Pacific", "China": "Asia-Pacific", "Hong Kong": "Asia-Pacific", "Singapore": "Asia-Pacific",
+    "South Korea": "Asia-Pacific", "Australia": "Asia-Pacific", "India": "Asia-Pacific", "Bangladesh": "Asia-Pacific",
+    "UAE": "Middle East", "Global": "Global",
+}
+
+
+def region_of(country):
+    """Region where the event happened: the last place listed (e.g. 'UK/Singapore' -> Singapore)."""
+    parts = [p.strip() for p in country.split("/")]
+    for p in reversed(parts):
+        if p in REGION and REGION[p] != "Global":
+            return REGION[p]
+    return REGION.get(parts[0], "Global")
+
+
+BO_FAMILIES = {"Payments, settlement & IT", "Client money & custody", "Reporting & record-keeping",
+               "Surveillance & data controls", "Trading & settlement controls", "Execution & algorithm error",
+               "Cyber theft", "Valuation & risk-limit failure", "Counterparty risk process"}
+BO_WORDS = ("reconcil", "confirm", "back office", "settle", "custody", "booking", "booked", "verification",
+            "segregat", "error account", "unsettled", "price verification", "trade entr", "data")
+
+
+def back_office_flag(eid, fam, ctrl, what):
+    """Y when the loss came from failed operational / back- or middle-office controls
+    (processing, reconciliation, settlement, custody, reporting, surveillance, data,
+    IT, pre-trade limits, valuation checks). Pure conduct cases (benchmark rigging,
+    client pricing) are N unless the failure was in billing/processing controls."""
+    if eid in ("OD11", "AP01"):
+        return "Y"
+    if eid == "CM07":
+        return "N"
+    if fam in BO_FAMILIES:
+        return "Y"
+    text = (ctrl + " " + what).lower()
+    return "Y" if any(w in text for w in BO_WORDS) else "N"
 
 
 def source_db(eid, off):
@@ -656,7 +722,8 @@ def source_db(eid, off):
                       ("finma.ch", "FINMA"), ("bankofengland", "PRA / Bank of England"), ("csrc", "CSRC"),
                       ("sfc.hk", "Hong Kong SFC"), ("mas.gov.sg", "MAS"), ("fi.se", "Finansinspektionen"),
                       ("fbi.gov", "FBI"), ("ic3.gov", "FBI"), ("newyorkfed", "New York Fed"), ("gov.uk", "UK government"),
-                      ("police.gov.sg", "Singapore Police"), ("ris.bka.gv.at", "Austrian courts")):
+                      ("police.gov.sg", "Singapore Police"), ("ris.bka.gv.at", "Austrian courts"), ("asic.gov.au", "ASIC"), ("asx.com.au", "company disclosure"),
+                      ("nseindia.com", "company disclosure")):
         if key in off:
             return name
     return "company disclosure"
@@ -671,10 +738,10 @@ def main(out=Path(__file__).with_name("extreme_events.csv")):
         if loss is not None and loss < 10 and nm != "Y":
             raise ValueError(f"{eid} below USD 10m: {loss}")
         off = OFFICIAL.get(eid) or next((u for u in (s1, s2) if u and any(d in u for d in OFFICIAL_DOMAINS)), "")
-        rows.append([eid, ann, y, firm, ftype, ctry, FAMILY[arch], arch, basel, bl, what, amt, ccy, loss, comp, nm, expo,
+        rows.append([eid, ann, y, firm, ftype, ctry, region_of(ctry), back_office_flag(eid, FAMILY[arch], ctrl, what), FAMILY[arch], arch, basel, bl, what, amt, ccy, loss, comp, nm, expo,
                      lag, ctrl, "Y" if (basel == "Internal fraud" or eid == "OD07") else "N", source_db(eid, off),
                      s1, s2, off or "none located", conf])
-    rows.sort(key=lambda x: (x[6], x[1]))
+    rows.sort(key=lambda x: (x[8], x[1]))
     with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(HEAD)
