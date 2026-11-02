@@ -1,0 +1,243 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market Ops Loss Scenarios</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: an operations run-book — lifecycle matrix on top, step cards, then the event ledger */
+:root {
+  --bg: #f3f5f6; --panel: #ffffff; --ink: #14212b; --muted: #5a6b76; --line: #d8dfe3;
+  --accent: #0b6e70; --accent-soft: #dcefef; --amber: #a86400; --amber-soft: #fbefdc; --red: #a2353a; --red-soft: #f7e3e3;
+  --cell0: #eef2f4; --cell1: #cfe7e6; --cell2: #8fcac7; --cell3: #3e9f9c;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --body: "Source Sans 3", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f171c; --panel: #16222a; --ink: #e3eaee; --muted: #93a4ae; --line: #2a3a44;
+  --accent: #4fc2bd; --accent-soft: #163a3c; --amber: #e7a54a; --amber-soft: #3a2a12; --red: #ea8a8e; --red-soft: #3c1d20;
+  --cell0: #1b2a32; --cell1: #1d4446; --cell2: #2a6c6b; --cell3: #3fa39f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f171c; --panel: #16222a; --ink: #e3eaee; --muted: #93a4ae; --line: #2a3a44;
+  --accent: #4fc2bd; --accent-soft: #163a3c; --amber: #e7a54a; --amber-soft: #3a2a12; --red: #ea8a8e; --red-soft: #3c1d20;
+  --cell0: #1b2a32; --cell1: #1d4446; --cell2: #2a6c6b; --cell3: #3fa39f; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; display: grid; gap: 22px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.7rem); line-height: 1.05; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.05rem; }
+.eyebrow { font: 500 0.72rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { max-width: 68ch; margin: 8px 0 0; color: var(--muted); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; font-family: var(--mono); font-size: 0.85rem; color: var(--muted); }
+.stats b { color: var(--ink); font-weight: 500; font-size: 1.05rem; }
+.mx { overflow-x: auto; }
+table.matrix { border-collapse: separate; border-spacing: 3px; font-size: 0.85rem; min-width: 700px; }
+.matrix th { font: 600 0.78rem/1.2 var(--display); color: var(--muted); text-align: left; vertical-align: bottom; padding: 4px; }
+.matrix th.row { min-width: 230px; color: var(--ink); font-size: 0.86rem; vertical-align: middle; }
+.matrix td { padding: 0; }
+.matrix button { width: 100%; min-width: 64px; height: 40px; border: 1px solid transparent; border-radius: 6px; font: 500 0.9rem var(--mono); cursor: pointer; color: var(--ink); }
+.matrix button[disabled] { cursor: default; color: transparent; }
+.matrix button[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 1px; }
+.matrix button:focus-visible, .steps button:focus-visible, select:focus-visible, input:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hint { font-size: 0.85rem; color: var(--muted); margin: 0; }
+.steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.step { text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 8px; cursor: pointer; color: var(--ink); font: inherit; min-width: 0; }
+.step[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.step .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.step .n { font: 500 0.8rem var(--mono); color: var(--muted); white-space: nowrap; }
+.step p { margin: 0; font-size: 0.9rem; }
+.step .lbl { font: 500 0.68rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 2px; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; }
+.field { display: grid; gap: 4px; min-width: 0; flex: 1 1 200px; }
+.field label { font-size: 0.8rem; color: var(--muted); }
+select, input[type=search] { font: inherit; font-size: 0.95rem; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.92rem; }
+.toggles label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.active { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.85rem; color: var(--muted); }
+.chip { font: 500 0.78rem var(--mono); border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 99px; padding: 3px 10px; cursor: pointer; }
+.list { display: grid; gap: 10px; }
+.ev { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; background: var(--panel); min-width: 0; }
+.ev .row1 { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; }
+.ev .firm { font: 600 1.02rem var(--display); }
+.ev .amt { font: 500 1rem var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+.ev .amt small { display: block; font-size: 0.7rem; color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.75rem; }
+.tag { font-family: var(--mono); padding: 1px 7px; border-radius: 4px; background: var(--cell0); color: var(--muted); }
+.tag.step { background: var(--accent-soft); color: var(--accent); }
+.tag.nm { background: var(--amber-soft); color: var(--amber); }
+.tag.if { background: var(--red-soft); color: var(--red); }
+.val { margin: 0; font-size: 0.95rem; }
+.val b { font-weight: 600; }
+.what { margin: 0; font-size: 0.88rem; color: var(--muted); }
+.why { margin: 0; font-size: 0.88rem; }
+.why b { font-weight: 600; }
+.fit { font: 500 0.68rem var(--mono); letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; vertical-align: 2px; white-space: nowrap; }
+.fit-High { background: var(--accent); color: var(--panel); }
+.fit-Medium { background: var(--accent-soft); color: var(--accent); }
+.fit-Low { background: var(--cell0); color: var(--muted); }
+.src { font-size: 0.82rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+a { color: var(--accent); }
+.empty { color: var(--muted); }
+.notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; max-width: 80ch; }
+@media (prefers-reduced-motion: no-preference) { .step, .matrix button { transition: border-color .15s, box-shadow .15s, outline-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Extreme loss library · market operations back office</div>
+    <h1>Where back-office validations failed</h1>
+    <p class="lede">Real losses and near misses where a market operations back-office check failed, or would have caught the problem. Ranked for a bank that serves clients and interbank counterparties, hedges client deals back-to-back and holds only small own risk-management positions. Products: FX, FX options, interest rate derivatives, structured products, money markets, deposits and loans, and interbank transfers.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="h-sum">
+    <h2 id="h-sum" class="eyebrow" style="font-size:.72rem">Summary</h2>
+    <div class="stats" id="stats">Loading…</div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-mx">
+    <h2 id="h-mx">Process step × where the exposure came from</h2>
+    <p class="hint">Number of events in each cell under the current filters. Tap a cell to list its events below. Rows follow the deal lifecycle, from onboarding a client to reporting.</p>
+    <div class="mx"><table class="matrix" id="matrix"></table></div>
+  </section>
+
+  <section aria-labelledby="h-st" style="display:grid;gap:12px">
+    <h2 id="h-st">Validations and scenario prompts</h2>
+    <p class="hint">For each step: the validation that should hold, a scenario to test in a workshop, and the events behind it. Tap a card to filter.</p>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-ev">
+    <h2 id="h-ev">Events</h2>
+    <div class="filters">
+      <div class="field"><label for="q">Search</label><input id="q" type="search" placeholder="e.g. SWIFT, swaption, confirmation" autocomplete="off"></div>
+      <div class="field"><label for="fprod">Product</label><select id="fprod"><option value="">All products</option></select></div>
+      <div class="field"><label for="fstep">Process step</label><select id="fstep"><option value="">All steps</option></select></div>
+      <div class="field"><label for="sort">Sort by</label><select id="sort"><option value="fit">Best fit first</option><option value="size">Largest loss or exposure</option><option value="new">Most recent</option><option value="old">Oldest</option></select></div>
+    </div>
+    <div class="toggles">
+      <label><input type="checkbox" id="t-low"> Include trading-book events (low fit)</label>
+      <label><input type="checkbox" id="t-if"> Hide internal fraud</label>
+      <label><input type="checkbox" id="t-nm" checked> Include near misses</label>
+    </div>
+    <div class="active" id="active"></div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-n">
+    <h2 id="h-n">How to read it</h2>
+    <ul class="notes">
+      <li><b>Fit</b> rates how close the event is to your business. <b>High</b> means the same product and process as your client, back-to-back or payments flow. <b>Medium</b> means the same validation at a different scale or product, or a front-office-led failure the back office can flag. <b>Low</b> means it needs a large trading book. Low-fit events are hidden unless you include them.</li>
+      <li><b>Where the exposure came from:</b> client, interbank counterparty, back-to-back hedge, payments and nostro, own positions, or regulatory.</li>
+      <li><b>Severity for your model:</b> own-position losses are capped by your small limits, but payment, settlement, client-default and capacity events scale with the size of a single payment or client relationship. They are the ones that set the extreme tail of your scenarios.</li>
+      <li><b>Internal fraud</b> is flagged so it can be kept apart for a separate exercise. These events are still listed because the back-office validation that failed (confirmations, price verification, reconciliation) is the scenario.</li>
+      <li><b>Loss</b> is what the firm lost or paid. <b>Near misses</b> show the exposure (amount sent or at risk), not a loss. USD at average rates of the year announced.</li>
+      <li><b>Gaps:</b> few public cases exist for caps, floors and callable swaps, or for deposits and loans outside payment errors. Use the rates rows (DZ Bank, NatWest swaptions, Monte dei Paschi) as anchors for those scenarios.</li>
+      <li>Data: <a href="https://github.com/vkaps/Oprisk-poc/blob/main/scenarios/market_ops_bo.csv" target="_blank" rel="noopener">market_ops_bo.csv on GitHub</a>, part of the full Extreme Loss Library.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const usd = (m) => { if (m == null || isNaN(m)) return "–"; if (m >= 1e6) return "$" + (m / 1e6).toFixed(0) + "tn"; if (m >= 1000) return "$" + (m / 1000).toFixed(m >= 10000 ? 0 : 1) + "bn"; return "$" + (m >= 10 ? Math.round(m) : m.toFixed(1)) + "m"; };
+  let ORDER = [], SOURCES = [];
+  const SHORT = { "FX spot, forwards & swaps": "FX spot / fwd / swap", "FX options": "FX options", "Interest rate derivatives (swaps, swaptions, caps, floors)": "IR derivatives",
+    "Structured products": "Structured", "Money markets, deposits & loans": "MM, deposits, loans", "Interbank transfers & nostro": "Transfers & nostro",
+    "Repo, securities & collateral": "Repo & collateral", "Other traded products (analog)": "Other (analog)" };
+  let E = [], STEPS = {}, PRODUCTS = [], sel = { step: "", prod: "" };
+  const size = (e) => (e.near_miss === "Y" ? e.exposure_usd_m : e.loss_usd_m) ?? -1;
+
+  function filtered() {
+    const q = $("q").value.trim().toLowerCase(), low = $("t-low").checked, noIF = $("t-if").checked, nm = $("t-nm").checked;
+    const st = sel.step || $("fstep").value, pr = $("fprod").value, so = sel.prod;
+    const r = E.filter((e) => (!st || e.process_step === st) && (!pr || e.product === pr) && (!so || e.exposure_source === so) && (low || e.fit !== "Low") &&
+      (!noIF || e.internal_fraud !== "Y") && (nm || e.near_miss !== "Y") &&
+      (!q || [e.firm, e.what_happened, e.validation_failed, e.product, e.process_step, e.country, e.exposure_source, e.fit_reason].join(" ").toLowerCase().includes(q)));
+    const s = $("sort").value;
+    const fr = { High: 0, Medium: 1, Low: 2 };
+    r.sort(s === "fit" ? (a, b) => fr[a.fit] - fr[b.fit] || size(b) - size(a) : s === "size" ? (a, b) => size(b) - size(a) : s === "new" ? (a, b) => b.announced.localeCompare(a.announced) : (a, b) => a.announced.localeCompare(b.announced));
+    return r;
+  }
+
+  function drawMatrix() {
+    const base = E.filter((e) => ($("t-low").checked || e.fit !== "Low") && (!$("fprod").value || e.product === $("fprod").value) && (!$("t-if").checked || e.internal_fraud !== "Y") && ($("t-nm").checked || e.near_miss !== "Y"));
+    const cnt = {}; base.forEach((e) => { const k = e.process_step + "|" + e.exposure_source; cnt[k] = (cnt[k] || 0) + 1; });
+    const shade = (n) => n === 0 ? "var(--cell0)" : n === 1 ? "var(--cell1)" : n <= 3 ? "var(--cell2)" : "var(--cell3)";
+    let h = "<thead><tr><th></th>" + SOURCES.map((p) => `<th scope="col">${esc(p)}</th>`).join("") + "</tr></thead><tbody>";
+    ORDER.forEach((s) => {
+      h += `<tr><th scope="row" class="row">${esc(s)}</th>`;
+      SOURCES.forEach((p) => {
+        const n = cnt[s + "|" + p] || 0, on = sel.step === s && sel.prod === p;
+        h += `<td><button type="button" data-s="${esc(s)}" data-p="${esc(p)}" style="background:${shade(n)}" aria-pressed="${on}" ${n ? "" : "disabled"} aria-label="${esc(s)}, ${esc(p)}: ${n} events">${n || "·"}</button></td>`;
+      });
+      h += "</tr>";
+    });
+    $("matrix").innerHTML = h + "</tbody>";
+    $("matrix").querySelectorAll("button:not([disabled])").forEach((b) => b.addEventListener("click", () => {
+      const same = sel.step === b.dataset.s && sel.prod === b.dataset.p;
+      sel = same ? { step: "", prod: "" } : { step: b.dataset.s, prod: b.dataset.p };
+      $("fstep").value = ""; render(true);
+    }));
+  }
+
+  function drawSteps() {
+    $("steps").innerHTML = ORDER.map((s) => {
+      const ev = E.filter((e) => e.process_step === s && ($("t-low").checked || e.fit !== "Low")), big = ev.reduce((m, e) => Math.max(m, size(e)), 0);
+      const on = sel.step === s && !sel.prod;
+      return `<button type="button" class="step" data-s="${esc(s)}" aria-pressed="${on}">
+        <span class="top"><h3>${esc(s)}</h3><span class="n">${ev.length} events · max ${usd(big)}</span></span>
+        <p><span class="lbl">Validation</span>${esc(STEPS[s]?.validation)}</p>
+        <p><span class="lbl">Scenario</span>${esc(STEPS[s]?.scenario)}</p></button>`;
+    }).join("");
+    $("steps").querySelectorAll(".step").forEach((b) => b.addEventListener("click", () => {
+      sel = sel.step === b.dataset.s && !sel.prod ? { step: "", prod: "" } : { step: b.dataset.s, prod: "" };
+      $("fstep").value = ""; render(true);
+    }));
+  }
+
+  function card(e) {
+    const nm = e.near_miss === "Y", v = nm ? e.exposure_usd_m : e.loss_usd_m;
+    const links = [e.official_source !== "none located" ? e.official_source : null, e.source_1, e.source_2].filter((u, i, a) => u && a.indexOf(u) === i)
+      .map((u) => { let h = u; try { h = new URL(u).hostname.replace(/^www\./, ""); } catch (_) {} return `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(h)}</a>`; }).join("");
+    return `<article class="ev">
+      <div class="row1"><span class="firm"><span class="fit fit-${esc(e.fit)}">${esc(e.fit)} fit</span> ${esc(e.firm)}</span><span class="amt">${usd(v)}<small>${nm ? "exposure · near miss" : e.loss_usd_m == null ? "loss not published" : "loss"}</small></span></div>
+      <div class="tags"><span class="tag">${esc(e.announced)}</span><span class="tag">${esc(e.country)}</span><span class="tag step">${esc(e.process_step)}</span><span class="tag">${esc(SHORT[e.product] || e.product)}</span><span class="tag">${esc(e.exposure_source)}</span>${nm ? '<span class="tag nm">near miss</span>' : ""}${e.internal_fraud === "Y" ? '<span class="tag if">internal fraud</span>' : ""}</div>
+      <p class="val"><b>Validation that failed:</b> ${esc(e.validation_failed)}</p>
+      <p class="what">${esc(e.what_happened)}</p>
+      <p class="why"><b>Why it fits:</b> ${esc(e.fit_reason)}</p>
+      <div class="src">${links}</div></article>`;
+  }
+
+  function render(scroll) {
+    const r = filtered(), real = r.filter((e) => e.near_miss !== "Y");
+    const act = [];
+    if (sel.step) act.push(sel.step); if (sel.prod) act.push(sel.prod);
+    $("active").innerHTML = `<span>${r.length} events · ${usd(real.reduce((a, e) => a + (e.loss_usd_m || 0), 0))} realised loss</span>` +
+      (act.length ? ` <button type="button" class="chip" id="clear">${esc(act.join(" × "))} ✕</button>` : "");
+    $("clear")?.addEventListener("click", () => { sel = { step: "", prod: "" }; render(); });
+    $("list").innerHTML = r.length ? r.map(card).join("") : '<p class="empty">No events match. Clear a filter to see more.</p>';
+    drawMatrix(); drawSteps();
+    if (scroll) $("h-ev").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }
+
+  ["q", "sort", "t-low", "t-if", "t-nm"].forEach((id) => $(id).addEventListener("input", () => render()));
+  $("fstep").addEventListener("change", () => { sel = { step: "", prod: "" }; render(); });
+  $("fprod").addEventListener("change", () => render());
+
+  fetch("market_ops_bo.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((j) => {
+    E = j.events; STEPS = j.steps; PRODUCTS = j.products; ORDER = j.order; SOURCES = j.sources;
+    $("fprod").insertAdjacentHTML("beforeend", PRODUCTS.map((p) => `<option value="${esc(p)}">${esc(p)}</option>`).join(""));
+    $("fstep").insertAdjacentHTML("beforeend", ORDER.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join(""));
+    const real = E.filter((e) => e.near_miss !== "Y"), nm = E.filter((e) => e.near_miss === "Y");
+    $("stats").innerHTML = `<span><b>${E.length}</b> events</span><span><b>${E.filter((e) => e.fit === "High").length}</b> high fit</span><span><b>${E.filter((e) => e.exposure_source === "Client" || e.exposure_source === "Interbank counterparty" || e.exposure_source === "Back-to-back hedge").length}</b> client, counterparty or back-to-back</span>` +
+      `<span><b>${usd(real.reduce((a, e) => a + (e.loss_usd_m || 0), 0))}</b> realised losses</span><span><b>${nm.length}</b> near misses</span>` +
+      `<span><b>${E.filter((e) => e.internal_fraud === "Y").length}</b> internal fraud</span><span>${Math.min(...E.map((e) => +e.announced.slice(0, 4)))}–${Math.max(...E.map((e) => +e.announced.slice(0, 4)))}</span>`;
+    render();
+  }).catch((err) => { $("stats").textContent = `Could not load the events (${err.message}). Reload to try again.`; });
+})();
+</script>
