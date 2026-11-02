@@ -23,7 +23,7 @@ from pathlib import Path
 FX = {
     "USD": {},
     "GBP": {1995: 1.58, 1996: 1.56, 1997: 1.64, 2010: 1.55, 2012: 1.58, 2013: 1.56, 2014: 1.65, 2015: 1.53,
-            2016: 1.36, 2017: 1.29, 2018: 1.34, 2019: 1.28, 2022: 1.24, 2023: 1.24, 2024: 1.28},
+            2016: 1.36, 2017: 1.29, 2018: 1.34, 2019: 1.28, 2020: 1.28, 2022: 1.24, 2023: 1.24, 2024: 1.28, 2025: 1.30},
     "EUR": {2004: 1.24, 2006: 1.26, 2007: 1.37, 2008: 1.47, 2015: 1.11, 2016: 1.11, 2018: 1.18},
     "JPY": {1993: 1 / 111, 1994: 1 / 102, 1996: 1 / 109, 2005: 1 / 110},
     "CAD": {2007: 0.93},
@@ -32,6 +32,7 @@ FX = {
     "SEK": {2010: 0.139},
     "SGD": {2020: 0.725},
     "CNY": {2013: 0.161},
+    "KRW": {2023: 0.00077},
 }
 
 
@@ -461,6 +462,94 @@ ROWS = [
  "SEC and CFTC fined 16 firms (incl. Barclays, BofA, Citi, Credit Suisse, Deutsche, Goldman, Morgan Stanley, UBS) for unrecorded WhatsApp use; ~$1.8bn combined.", 1800, "USD",
  "regulatory fines (industry total)", "N", None, 3, "No capture of off-channel communications",
  "https://lowenstein.com/news-insights/publications/client-alerts/regulators-crack-down-on-the-use-of-messaging-apps-as-wall-street-banks-and-investment-advisers-hit-with-18-billion-in-fines", "", "High"),
+
+# ======== Official-database sweep (added 2026-11): control failures of USD 10m+ in markets and
+# back office, taken from regulators' enforcement registers (FCA fines register, SEC, CFTC, Fed,
+# OCC, FINRA, Korea FSC). source_1 is the regulator's own release.
+("OD01", "2015-04", "Merrill Lynch International", "bank", "UK", "Transaction reporting failure", "Execution, delivery & process management", "Trading & Sales",
+ "Failed to report or accurately report transactions (2007-2014); FCA fine GBP 13.3m.", 13.3, "GBP",
+ "regulatory fine", "N", None, 7, "Reporting set-up not reconciled to trading",
+ "https://www.fca.org.uk/news/press-releases/fca-fines-merrill-lynch-international-for-transaction-reporting-failures", "", "High"),
+("OD02", "2019-10", "Tullett Prebon (Europe)", "broker-dealer", "UK", "Trade surveillance gaps", "Clients, products & business practices", "Trading & Sales",
+ "Failed to manage the risk of brokers arranging wash trades and to be open with the FCA; fine GBP 15.4m.", 15.4, "GBP",
+ "regulatory fine", "N", None, 3, "Broker conduct not monitored; weak compliance oversight",
+ "https://www.fca.org.uk/news/press-releases/fca-fines-tullett-prebon-154-million", "", "High"),
+("OD03", "2020-12", "Charles Schwab UK", "broker-dealer", "UK", "Client money segregation", "Execution, delivery & process management", "Agency Services",
+ "Client money and assets not properly safeguarded (CASS) and FCA not told; fine GBP 9.0m.", 9.0, "GBP",
+ "regulatory fine", "N", None, None, "Client-asset rules not applied after a business change",
+ "https://www.fca.org.uk/news/press-releases/fca-fines-charles-schwab-uk-over-safeguarding-and-compliance-failures", "", "High"),
+("OD04", "2022-03", "GAM International Management", "asset manager", "UK", "Conflicts in fund trading", "Clients, products & business practices", "Asset Management",
+ "Failed to manage conflicts of interest in fund investments; FCA fine GBP 9.1m.", 9.1, "GBP",
+ "regulatory fine", "N", None, None, "Conflict and due-diligence controls bypassed",
+ "https://www.fca.org.uk/publication/final-notices/gam-international-management-limited-2022.pdf", "", "High"),
+("OD05", "2022-08", "Citigroup Global Markets", "bank", "UK", "Trade surveillance gaps", "Execution, delivery & process management", "Trading & Sales",
+ "Market-abuse surveillance (MAR Art. 16) did not cover certain trading activity; FCA fine GBP 12.6m.", 12.6, "GBP",
+ "regulatory fine", "N", None, 3, "Surveillance coverage gaps by product and desk",
+ "https://www.fca.org.uk/publication/final-notices/citigroup-global-markets-limited-2022.pdf", "", "High"),
+("OD06", "2023-06", "ED&F Man Capital Markets", "broker-dealer", "UK", "Client trading controls", "Clients, products & business practices", "Trading & Sales",
+ "Inadequate controls over cum-ex dividend-arbitrage trading used to make fraudulent tax claims; FCA fine GBP 17.2m.", 17.2, "GBP",
+ "regulatory fine", "N", None, 4, "Due diligence on client trading strategies",
+ "https://www.fca.org.uk/publication/final-notices/edf-man-capital-markets-ltd-2023.pdf", "", "High"),
+("OD07", "2024-11", "Macquarie Bank (London branch)", "bank", "UK", "Fictitious trades undetected", "Execution, delivery & process management", "Trading & Sales",
+ "A trader booked hundreds of fictitious trades over about 18 months; controls failed to detect them; FCA fine GBP 13.0m.", 13.0, "GBP",
+ "regulatory fine", "N", None, 1.5, "Trade validation and price-check controls did not flag fictitious trades",
+ "https://www.fca.org.uk/publication/final-notices/macquarie-bank-limited-london-branch-2024.pdf", "", "High"),
+("OD08", "2025-03", "London Metal Exchange", "market infrastructure", "UK", "Trading venue controls", "Execution, delivery & process management", "Trading & Sales",
+ "Weak trading-venue controls (MiFID RTS 7) exposed during the March 2022 nickel crisis; FCA fine GBP 9.2m.", 9.2, "GBP",
+ "regulatory fine", "N", None, None, "Price-limit and market-monitoring controls inadequate",
+ "https://www.fca.org.uk/publication/final-notices/london-metal-exchange-2025.pdf", "", "High"),
+("OD09", "2016-06", "Merrill Lynch (customer protection rule)", "bank", "US", "Customer protection / segregation", "Execution, delivery & process management", "Retail Brokerage",
+ "Used complex options trades to cut the customer reserve account and freed billions a week of customer cash for firm trading (2009-2012); $57m disgorgement + $358m penalty.", 415, "USD",
+ "disgorgement and penalty", "N", None, 3, "Reserve computation engineered; fully paid securities held in liened accounts",
+ "https://www.sec.gov/newsroom/press-releases/2016-128", "", "High"),
+("OD10", "2016-09", "Merrill Lynch (market access)", "bank", "US", "Market access controls", "Execution, delivery & process management", "Trading & Sales",
+ "Erroneous-order limits set so high they were ineffective; at least 15 mini flash crashes 2012-2014; SEC $12.5m.", 12.5, "USD",
+ "regulatory fine", "N", None, 2, "Pre-trade limits not calibrated to liquidity",
+ "https://www.sec.gov/news/pressrelease/2016-192.html", "", "High"),
+("OD11", "2019-06", "State Street (custody expense markups)", "bank", "US", "Client overcharging", "Execution, delivery & process management", "Agency Services",
+ "Undisclosed markups on out-of-pocket expenses billed to custody and fund clients for 17 years; SEC $88m.", 88, "USD",
+ "repayment and penalty", "N", None, 17, "Billing controls; no review of invoice markups",
+ "https://www.sec.gov/news/press-release/2019-114", "", "High"),
+("OD12", "2021-06", "Robinhood Financial", "broker-dealer", "US", "Platform outages and controls", "Business disruption & system failures", "Retail Brokerage",
+ "System outages in March 2020, options approvals without proper checks and misleading information; FINRA fine $57m + $12.6m restitution.", 69.6, "USD",
+ "fine and restitution", "N", None, 2, "Technology supervision and automated approval controls",
+ "https://www.finra.org/sites/default/files/2021-06/robinhood-financial-awc-063021.pdf", "", "High"),
+("OD13", "2022-09", "Morgan Stanley Smith Barney", "bank", "US", "Data disposal failure", "Execution, delivery & process management", "Retail Brokerage",
+ "Decommissioned servers and hard drives with data of ~15m customers resold without wiping; SEC $35m.", 35, "USD",
+ "regulatory fine", "N", None, 5, "Vendor oversight of data-device disposal",
+ "https://www.sec.gov/newsroom/press-releases/2022-168", "", "High"),
+("OD14", "2023-08", "11 firms (off-channel sweep 2023)", "industry", "US", "Off-channel communications", "Execution, delivery & process management", "Trading & Sales",
+ "SEC recordkeeping sweep: 11 firms fined for unrecorded off-channel messages.", 289, "USD",
+ "regulatory fines (industry total)", "N", None, 3, "No capture of off-channel communications",
+ "https://www.sec.gov/newsroom/press-releases/2023-149", "", "High"),
+("OD15", "2024-09", "11 firms (off-channel sweep 2024)", "industry", "US", "Off-channel communications", "Execution, delivery & process management", "Trading & Sales",
+ "SEC recordkeeping sweep: 11 firms fined (12 charged) for unrecorded off-channel messages.", 88.2, "USD",
+ "regulatory fines (industry total)", "N", None, 3, "No capture of off-channel communications",
+ "https://www.sec.gov/newsroom/press-releases/2024-144", "", "High"),
+("OD16", "2023-09", "Goldman Sachs (swap reporting)", "bank", "US", "Transaction reporting failure", "Execution, delivery & process management", "Trading & Sales",
+ "Over 20m swaps reported late or wrongly and 1m+ mid-market marks wrong or missing; CFTC $30m.", 30, "USD",
+ "regulatory fine", "N", None, 5, "Swap dealer supervision and reporting controls",
+ "https://www.cftc.gov/PressRoom/PressReleases/8801-23", "", "High"),
+("OD17", "2023-09", "JPMorgan (swap reporting)", "bank", "US", "Transaction reporting failure", "Execution, delivery & process management", "Trading & Sales",
+ "Over 40m swaps under- or misreported since 2017; CFTC $15m.", 15, "USD",
+ "regulatory fine", "N", None, 6, "Reporting logic for FX forwards and collateral flags",
+ "https://www.cftc.gov/PressRoom/PressReleases/8801-23", "", "High"),
+("OD18", "2024-03", "JPMorgan Chase (trade surveillance)", "bank", "US", "Trade surveillance gaps", "Execution, delivery & process management", "Trading & Sales",
+ "Billions of orders from 30+ venues not fed into trade surveillance for years; Fed $98.2m, OCC $250m (March 2024), CFTC $200m (May 2024).", 548.2, "USD",
+ "regulatory fines", "N", None, 7, "Venue data feeds not reconciled to surveillance inputs",
+ "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20240314a.htm", "https://www.cftc.gov/PressRoom/PressReleases/8914-24", "High"),
+("OD19", "2024-07", "Citigroup (data quality)", "bank", "US", "Data and risk-management controls", "Execution, delivery & process management", "Commercial Banking",
+ "Insufficient progress fixing data-quality management under 2020 orders; Fed $60.6m and OCC $75m.", 135.6, "USD",
+ "regulatory fines", "N", None, 4, "Regulatory and risk data quality",
+ "https://www.federalreserve.gov/newsevents/pressreleases/enforcement20240710a.htm", "https://www.occ.treas.gov/news-issuances/news-releases/2024/nr-occ-2024-76.html", "High"),
+("OD20", "2023-12", "Two global investment banks (Korea short selling)", "bank", "South Korea", "Short-selling borrow controls", "Execution, delivery & process management", "Trading & Sales",
+ "Short sales placed without first borrowing the shares (KRW 56bn of orders, 2021-2022); FSC penalty surcharges KRW 26.52bn; firms unnamed by the regulator.", 26520, "KRW",
+ "regulatory penalties", "N", None, 1, "No pre-trade check that shares were borrowed",
+ "https://fsc.go.kr/eng/pr010101/81330", "", "High"),
+("OD21", "2013-05", "Nasdaq (Facebook IPO)", "market infrastructure", "US", "Trading venue controls", "Business disruption & system failures", "Trading & Sales",
+ "IPO cross design flaw delayed confirmations for the Facebook IPO; SEC penalty $10m and $62m member compensation plan.", 72, "USD",
+ "penalty 10 + compensation 62", "N", None, 0, "Untested system limits for an exceptional IPO",
+ "https://www.sec.gov/files/litigation/admin/2013/34-69655.pdf", "", "High"),
 ]
 
 FAMILY = {  # scenario families used for scenario workshops
@@ -483,11 +572,94 @@ FAMILY = {  # scenario families used for scenario workshops
     "Front-running / information leakage": "Trading conduct & client pricing", "Venue misrepresentation": "Trading conduct & client pricing",
     "Client overcharging": "Trading conduct & client pricing", "Trade allocation (cherry-picking)": "Trading conduct & client pricing",
     "Transaction reporting failure": "Reporting & record-keeping", "Off-channel communications": "Reporting & record-keeping",
+    "Trade surveillance gaps": "Surveillance & data controls", "Data and risk-management controls": "Surveillance & data controls",
+    "Data disposal failure": "Surveillance & data controls", "Client trading controls": "Surveillance & data controls",
+    "Fictitious trades undetected": "Rogue trading & concealment",
+    "Market access controls": "Trading & settlement controls", "Short-selling borrow controls": "Trading & settlement controls",
+    "Trading venue controls": "Trading & settlement controls", "Platform outages and controls": "Payments, settlement & IT",
+    "Customer protection / segregation": "Client money & custody", "Conflicts in fund trading": "Trading conduct & client pricing",
+}
+
+
+# Official source per event: regulator, prosecutor or court, central bank, government,
+# or the firm's own filing / press release. Events whose own source_1/source_2 is
+# already official are detected automatically (OFFICIAL_DOMAINS).
+OFFICIAL_DOMAINS = ("fca.org.uk", "sec.gov", "cftc.gov", "justice.gov", "federalreserve.gov", "bankofengland",
+                    "finma.ch", "occ.gov", "apra.gov.au", "societegenerale.com", "fsa.go.jp", "csrc.gov.cn", "sfc.hk",
+                    "mas.gov.sg", "newyorkfed.org", "ic3.gov", "fbi.gov", "gov.uk", "fi.se", "police.gov.sg",
+                    "jpx.co.jp", "mtgox.com", "nomuraholdings.com", "morganstanley.com", "ubs.com", "mufg.jp",
+                    "mitsubishicorp.com", "credit-agricole.com", "nab.com.au", "ris.bka.gv.at", "coincheck.com",
+                    "sse.com.cn", "tsb.co.uk")
+OFFICIAL = {
+    "BM02": "https://www.cftc.gov/PressRoom/PressReleases/6472-12",
+    "BM03": "https://www.cftc.gov/PressRoom/PressReleases/6510-13",
+    "BM13": "https://www.cftc.gov/PressRoom/PressReleases/7056-14",
+    "BM17": "https://www.cftc.gov/PressRoom/PressReleases/7505-16",
+    "MC02": "https://www.cftc.gov/PressRoom/PressReleases/8220-20",
+    "MC03": "https://www.sec.gov/newsroom/press-releases/2024-6",
+    "MC07": "https://www.sec.gov/newsroom/press-releases/2016-152",
+    "CM07": "https://www.sec.gov/newsroom/press-releases/2022-84",
+    "CM03": "https://www.justice.gov/archive/usao/nys/pressreleases/July08/bennettrefcosentencingpr.pdf",
+    "CM02": "https://www.justice.gov/usao-ndia/pr/peregrine-financial-group-ceo-sentenced-50-years-fraud-embezzlement-and-lying",
+    "CM04": "https://www.fca.org.uk/publication/final-notices/jpmsl.pdf",
+    "RT17": "https://www.sec.gov/litigation/aljdec/id127cff.htm",
+    "RT02": "https://www.federalreserve.gov/boarddocs/press/enforcement/2003/20030505/default.htm",
+    "RT03": "https://www.cftc.gov/sites/default/files/opa/enf98/opa4144-98.htm",
+    "RT09": "https://www.justice.gov/usao-ndil/pr/tennessee-man-sentenced-five-years-prison-causing-mf-global-lose-141-million",
+    "RR03": "https://www.fca.org.uk/news/press-releases/fca-fines-goldman-sachs-international-transaction-reporting-failures",
+    "RR04": "https://www.sec.gov/newsroom/press-releases/2021-262",
+    "RR05": "https://www.sec.gov/newsroom/press-releases/2022-174",
+    "PS07": "https://www.fca.org.uk/news/press-releases/fca-fines-rbs-natwest-and-ulster-bank-ltd-42m-for-it-failures",
+    "EX06": "https://www.sec.gov/news/pressrelease/2015-133.html",
+    "EX05": "https://www.sec.gov/files/litigation/admin/2013/34-69655.pdf",
+    "EX04": "http://www.csrc.gov.cn/pub/csrc_en/newsfacts/release/201309/t20130911_233820.html",
+    "EX01": "https://www.jpx.co.jp/english/corporate/news-releases/0063/b5b4pj000000pr1b-att/20150904_E.pdf",
+    "CP02": "https://www.nomuraholdings.com/en/news/nr/news20210427102725.html",
+    "CP03": "https://www.morganstanley.com/content/dam/msdotcom/en/about-us-ir/shareholder/1q2021.pdf",
+    "CP04": "https://www.ubs.com/global/en/media/display-page-ndp/en-20210427-1q21-quarterly-result.html",
+    "CP05": "https://www.hd.sc.mufg.jp/english/finance/000020022.pdf",
+    "CY01": "https://www.newyorkfed.org/newsevents/statements/2016/0311-2016",
+    "CY03": "https://www.mtgox.com/img/pdf/20140228-announcement_eng.pdf",
+    "CY04": "https://corporate.coincheck.com/press/dG-nDV-c",
+    "CY05": "https://www.fbi.gov/news/press-releases/fbi-dc3-and-npa-identification-of-north-korean-cyber-actors-tracked-as-tradertraitor-responsible-for-theft-of-308-million-from-bitcoindmmcom",
+    "CY06": "https://www.ic3.gov/psa/2025/psa250226",
+    "RT01": "https://www.gov.uk/government/publications/report-into-the-collapse-of-barings-bank",
+    "RT04": "https://www.sec.gov/Archives/edgar/data/36510/000092838502000817/d8k.txt",
+    "RT05": "https://www.nab.com.au/content/dam/nabrwd/documents/reports/corporate/annual-financial-report-2004.pdf",
+    "RT07": "https://www.finma.ch/en/news/2012/11/mm-ubs-london-20121126",
+    "MV05": "https://www.fi.se/sv/publicerat/sanktioner/finansiella-foretag/2010/hq-banks-tillstand-aterkallas/",
+    "RT19": "https://www.mas.gov.sg/news/media-releases/2004/china-aviation-oil-singapore",
+    "RT21": "https://apps.sfc.hk/edistributionWeb/gateway/EN/news-and-announcements/news/doc?refNo=14PR108",
+    "RT25": "https://www.police.gov.sg/media-hub/news/2024/20241118_founder_of_hin_leong_trading_sentenced_and_jailed_for_cheating_and_instigating_forgery",
+    "RT24": "https://www.mitsubishicorp.com/jp/en/news/release/2019/0000038364.html",
+    "RT14": "https://www.credit-agricole.com/en/finance/financial-press-releases/calyon-press-release",
+    "BM01": "https://www.cftc.gov/PressRoom/PressReleases/6289-12",
+    "PS01": "https://www.occ.gov/news-issuances/news-releases/2020/nr-occ-2020-132.html",
+    "MC04": "https://www.sec.gov/newsroom/press-releases/2016-16",
+    "MC05": "https://www.sec.gov/newsroom/press-releases/2016-16",
+    "CM01": "https://www.cftc.gov/sites/default/files/idc/groups/public/@lrenforcementactions/documents/enforcementaction/enfmfglobalorder110813.pdf",
+    "RT11": "https://www.ris.bka.gv.at/Dokument.wxe?Abfrage=Justiz&Dokumentnummer=JJT_20101223_OGH0002_0140OS00143_09Z0000_000",
 }
 
 HEAD = ["event_id", "announced", "year", "firm", "firm_type", "country", "scenario_family", "archetype", "basel_event_type",
         "business_line", "what_happened", "loss_orig_m", "currency", "loss_usd_m", "loss_components",
-        "near_miss", "exposure_usd_m", "years_undetected", "control_failure", "source_1", "source_2", "confidence"]
+        "near_miss", "exposure_usd_m", "years_undetected", "control_failure", "internal_fraud", "source_database", "source_1", "source_2", "official_source", "confidence"]
+
+
+def source_db(eid, off):
+    """Which official database the event comes from (sweep rows) or what backs it."""
+    if not off:
+        return "public reporting"
+    for key, name in (("fca.org.uk", "FCA enforcement"), ("sec.gov", "SEC enforcement"), ("cftc.gov", "CFTC enforcement"),
+                      ("federalreserve.gov", "Federal Reserve enforcement"), ("occ.", "OCC enforcement"),
+                      ("finra.org", "FINRA disciplinary actions"), ("justice.gov", "US DOJ"), ("fsc.go.kr", "Korea FSC"),
+                      ("finma.ch", "FINMA"), ("bankofengland", "PRA / Bank of England"), ("csrc", "CSRC"),
+                      ("sfc.hk", "Hong Kong SFC"), ("mas.gov.sg", "MAS"), ("fi.se", "Finansinspektionen"),
+                      ("fbi.gov", "FBI"), ("ic3.gov", "FBI"), ("newyorkfed", "New York Fed"), ("gov.uk", "UK government"),
+                      ("police.gov.sg", "Singapore Police"), ("ris.bka.gv.at", "Austrian courts")):
+        if key in off:
+            return name
+    return "company disclosure"
 
 
 def main(out=Path(__file__).with_name("extreme_events.csv")):
@@ -496,10 +668,12 @@ def main(out=Path(__file__).with_name("extreme_events.csv")):
         (eid, ann, firm, ftype, ctry, arch, basel, bl, what, amt, ccy, comp, nm, expo, lag, ctrl, s1, s2, conf) = r
         y = int(ann[:4])
         loss = usd(amt, ccy, y)
-        if loss is not None and loss < 20 and nm != "Y":
-            raise ValueError(f"{eid} below USD 20m: {loss}")
+        if loss is not None and loss < 10 and nm != "Y":
+            raise ValueError(f"{eid} below USD 10m: {loss}")
+        off = OFFICIAL.get(eid) or next((u for u in (s1, s2) if u and any(d in u for d in OFFICIAL_DOMAINS)), "")
         rows.append([eid, ann, y, firm, ftype, ctry, FAMILY[arch], arch, basel, bl, what, amt, ccy, loss, comp, nm, expo,
-                     lag, ctrl, s1, s2, conf])
+                     lag, ctrl, "Y" if (basel == "Internal fraud" or eid == "OD07") else "N", source_db(eid, off),
+                     s1, s2, off or "none located", conf])
     rows.sort(key=lambda x: (x[6], x[1]))
     with open(out, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
