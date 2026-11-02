@@ -28,3 +28,13 @@ For **back-office control failures, excluding internal fraud**, filter `back_off
 | $1m–10m: others (SM21–SM39) | SEC, FINRA, CFTC, ASIC, SFC, BaFin, AMF, Central Bank of Ireland | A targeted sweep, **not complete**. FINRA and the SEC alone issue dozens of $1m+ reporting and records fines a year. |
 
 The $1m–10m tier is therefore UK-heavy. Use it for scenario ideas and control-failure patterns. Do not use it for frequency counts, except within the FCA 2013–2026 subset.
+
+## Market operations back-office view
+
+[`market_ops_bo.csv`](market_ops_bo.csv) holds 51 events where a market-ops back-office validation failed or would have caught the loss. Each is tagged with:
+- `product`: FX spot, forwards and swaps; FX options; IR derivatives; structured products; money markets, deposits and loans; interbank transfers and nostro; repo and collateral; or other (analog).
+- `process_step`: trade capture, confirmation, price verification, collateral, payment release, message security, nostro reconciliation, reporting, or system change.
+- `validation_failed`: the check that failed.
+- `relevance`: core or analog.
+
+Rebuild with `python scenarios/build_market_ops.py` after `build_extreme_events.py`.

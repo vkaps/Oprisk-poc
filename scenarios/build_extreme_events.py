@@ -23,14 +23,15 @@ from pathlib import Path
 FX = {
     "USD": {},
     "GBP": {1995: 1.58, 1996: 1.56, 1997: 1.64, 2010: 1.55, 2012: 1.58, 2013: 1.56, 2014: 1.65, 2015: 1.53,
-            2016: 1.36, 2017: 1.29, 2018: 1.34, 2019: 1.28, 2020: 1.28, 2022: 1.24, 2023: 1.24, 2024: 1.28, 2025: 1.30},
-    "EUR": {2004: 1.24, 2006: 1.26, 2007: 1.37, 2008: 1.47, 2015: 1.11, 2016: 1.11, 2018: 1.18, 2020: 1.14, 2021: 1.18, 2022: 1.05},
+            2016: 1.36, 2017: 1.29, 2018: 1.34, 2019: 1.28, 2020: 1.28, 2021: 1.38, 2022: 1.24, 2023: 1.24, 2024: 1.28, 2025: 1.30},
+    "EUR": {2004: 1.24, 2006: 1.26, 2007: 1.37, 2008: 1.47, 2015: 1.11, 2016: 1.11, 2018: 1.18, 2020: 1.14, 2021: 1.18, 2022: 1.05,
+            2003: 1.13, 2013: 1.33, 2017: 1.13},
     "JPY": {1993: 1 / 111, 1994: 1 / 102, 1996: 1 / 109, 2005: 1 / 110},
     "CAD": {2007: 0.93},
     "SEK": {2010: 0.139},
     "SGD": {2020: 0.725},
     "CNY": {2013: 0.161},
-    "KRW": {2023: 0.00077, 2024: 0.00073},
+    "KRW": {2023: 0.00077, 2024: 0.00073, 2026: 0.00072},
     "HKD": {2008: 0.128, 2018: 0.1276, 2019: 0.1276},
     "AUD": {2004: 0.74, 2022: 0.69, 2025: 0.645},
     "INR": {2019: 0.0142},
@@ -675,7 +676,8 @@ HEAD = ["event_id", "announced", "year", "firm", "firm_type", "country", "region
 REGION = {
     "UK": "Europe", "France": "Europe", "Germany": "Europe", "Switzerland": "Europe", "Ireland": "Europe",
     "Netherlands": "Europe", "Austria": "Europe", "Sweden": "Europe", "Croatia": "Europe", "UK/Ireland": "Europe",
-    "US": "Americas", "Canada": "Americas", "Chile": "Americas",
+    "US": "Americas", "Canada": "Americas", "Chile": "Americas", "Ecuador": "Americas", "Mexico": "Americas",
+    "Italy": "Europe", "Taiwan": "Asia-Pacific",
     "Japan": "Asia-Pacific", "China": "Asia-Pacific", "Hong Kong": "Asia-Pacific", "Singapore": "Asia-Pacific",
     "South Korea": "Asia-Pacific", "Australia": "Asia-Pacific", "India": "Asia-Pacific", "Bangladesh": "Asia-Pacific",
     "UAE": "Middle East", "Global": "Global",
@@ -745,8 +747,9 @@ def main(out=Path(__file__).with_name("extreme_events.csv")):
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
     from tier2_events import TIER2
+    from market_ops_events import MARKET_OPS
     rows = []
-    for r in ROWS + TIER2:
+    for r in ROWS + TIER2 + MARKET_OPS:
         (eid, ann, firm, ftype, ctry, arch, basel, bl, what, amt, ccy, comp, nm, expo, lag, ctrl, s1, s2, conf) = r
         y = int(ann[:4])
         loss = usd(amt, ccy, y)
