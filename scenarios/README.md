@@ -31,10 +31,15 @@ The $1m–10m tier is therefore UK-heavy. Use it for scenario ideas and control-
 
 ## Market operations back-office view
 
-[`market_ops_bo.csv`](market_ops_bo.csv) holds 51 events where a market-ops back-office validation failed or would have caught the loss. Each is tagged with:
-- `product`: FX spot, forwards and swaps; FX options; IR derivatives; structured products; money markets, deposits and loans; interbank transfers and nostro; repo and collateral; or other (analog).
-- `process_step`: trade capture, confirmation, price verification, collateral, payment release, message security, nostro reconciliation, reporting, or system change.
-- `validation_failed`: the check that failed.
-- `relevance`: core or analog.
+[`market_ops_bo.csv`](market_ops_bo.csv) holds 62 events where a market-ops back-office validation failed or would have caught the loss. It is ranked for a bank with client and interbank counterparty business, back-to-back hedging and only small own risk-management positions (no trading book).
+
+| Column | Meaning |
+|---|---|
+| `fit` | **High**: same product and process as a client, back-to-back or payments flow. **Medium**: same validation at a different scale or product, or front-office led. **Low**: needs a large trading book; keep only as a stress anchor. |
+| `fit_reason` | Why the event applies to this business model. |
+| `exposure_source` | Client, interbank counterparty, back-to-back hedge, payments and nostro, own positions, or regulatory. |
+| `product` | FX spot, forwards and swaps; FX options; IR derivatives; structured products; money markets, deposits and loans; interbank transfers and nostro; repo and collateral; or other. |
+| `process_step` | The deal lifecycle, from onboarding (capacity, limits) through booking and back-to-back matching, confirmations, price verification, collateral, payment release, instruction verification, nostro reconciliation, client rates and reporting to system change. |
+| `validation_failed` | The check that failed. |
 
 Rebuild with `python scenarios/build_market_ops.py` after `build_extreme_events.py`.

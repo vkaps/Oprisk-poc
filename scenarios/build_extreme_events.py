@@ -22,7 +22,7 @@ from pathlib import Path
 # approximate annual average USD per unit of currency, by year announced
 FX = {
     "USD": {},
-    "GBP": {1995: 1.58, 1996: 1.56, 1997: 1.64, 2010: 1.55, 2012: 1.58, 2013: 1.56, 2014: 1.65, 2015: 1.53,
+    "GBP": {1991: 1.77, 1995: 1.58, 1996: 1.56, 1997: 1.64, 2010: 1.55, 2012: 1.58, 2013: 1.56, 2014: 1.65, 2015: 1.53,
             2016: 1.36, 2017: 1.29, 2018: 1.34, 2019: 1.28, 2020: 1.28, 2021: 1.38, 2022: 1.24, 2023: 1.24, 2024: 1.28, 2025: 1.30},
     "EUR": {2004: 1.24, 2006: 1.26, 2007: 1.37, 2008: 1.47, 2015: 1.11, 2016: 1.11, 2018: 1.18, 2020: 1.14, 2021: 1.18, 2022: 1.05,
             2003: 1.13, 2013: 1.33, 2017: 1.13},
@@ -31,7 +31,7 @@ FX = {
     "SEK": {2010: 0.139},
     "SGD": {2020: 0.725},
     "CNY": {2013: 0.161},
-    "KRW": {2023: 0.00077, 2024: 0.00073, 2026: 0.00072},
+    "KRW": {2019: 0.000858, 2023: 0.00077, 2024: 0.00073, 2026: 0.00072},
     "HKD": {2008: 0.128, 2018: 0.1276, 2019: 0.1276},
     "AUD": {2004: 0.74, 2022: 0.69, 2025: 0.645},
     "INR": {2019: 0.0142},
@@ -603,7 +603,9 @@ FAMILY = {  # scenario families used for scenario workshops
     "Trading venue controls": "Trading & settlement controls", "Platform outages and controls": "Payments, settlement & IT",
     "Customer protection / segregation": "Client money & custody",
     "Settlement system project failure": "Payments, settlement & IT",
-    "Trade booking controls": "Trading & settlement controls", "Conflicts in fund trading": "Trading conduct & client pricing",
+    "Trade booking controls": "Trading & settlement controls",
+    "Client capacity failure": "Counterparty risk process", "Client margin shortfall": "Counterparty risk process",
+    "Client derivative mis-selling": "Trading conduct & client pricing", "Conflicts in fund trading": "Trading conduct & client pricing",
 }
 
 

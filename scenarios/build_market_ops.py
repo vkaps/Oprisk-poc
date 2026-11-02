@@ -1,12 +1,14 @@
-"""Market-operations back-office view of the Extreme Loss Library.
+"""Market-operations back-office view of the Extreme Loss Library, for a bank that
+serves clients and interbank counterparties, hedges client deals back-to-back and holds
+only small own risk-management positions (no trading book).
 
-Selects the events where an internal validation in a market-operations back office
-(treasury / capital-markets operations) failed or would have caught the loss, and tags
-each with product, process step and the validation that failed.
-
-relevance: "core"   = the product or process is run by a market-ops back office
-           "analog" = another product (futures, commodities, ABS), same validation failure
-Output: market_ops_bo.csv / .json (events) and market_ops_steps.json (scenario prompts).
+Each event is tagged with product, process step, the validation that failed, where the
+exposure came from (client, interbank counterparty, back-to-back hedge, own positions,
+payments and nostro, regulatory) and its fit to that business model:
+  High   = same product and process as a client / back-to-back / payments flow
+  Medium = same validation, different scale or product; or front-office led
+  Low    = needs a large trading book; keep only as a stress anchor
+Output: market_ops_bo.csv / .json
 """
 import csv
 import json
@@ -18,87 +20,134 @@ FX, FXO, IRD, STR, MM, PAY, SEC, OTH = ("FX spot, forwards & swaps", "FX options
                                         "Structured products", "Money markets, deposits & loans",
                                         "Interbank transfers & nostro", "Repo, securities & collateral",
                                         "Other traded products (analog)")
-CAP, CONF, SETT, NOST, IPV, COLL, CHG, MSG, REP = ("Trade capture & booking validation", "Confirmation & matching",
-                                                  "Payment release & settlement", "Nostro & cash reconciliation",
-                                                  "Independent price verification", "Collateral & margin",
-                                                  "System change & static data", "Payment message security",
-                                                  "Regulatory trade reporting")
+ONB, CAP, CONF, IPV, COLL, SETT, INSTR, NOST, BILL, REP, CHG = (
+    "Client & counterparty onboarding, capacity and limits", "Trade capture & back-to-back matching",
+    "Confirmation & matching", "Independent price verification", "Collateral, margin & credit limits",
+    "Payment release & settlement", "Payment instruction verification & message security",
+    "Nostro & cash reconciliation", "Client rates, charges & interest", "Regulatory trade reporting",
+    "System change & static data")
+ORDER = [ONB, CAP, CONF, IPV, COLL, SETT, INSTR, NOST, BILL, REP, CHG]
+CLI, CPT, B2B, OWN, PAYS, REG = ("Client", "Interbank counterparty", "Back-to-back hedge", "Own positions",
+                                  "Payments & nostro", "Regulatory")
 
-# id: (product, process step, validation that failed, relevance)
+# id: (product, step, validation that failed, exposure source, fit, why it fits)
 TAGS = {
-    "PS01": (MM, SETT, "Manual override in the loan system paid out principal instead of an interest payment; three approvers passed the screen.", "core"),
-    "PS02": (FX, SETT, "A junior FX operations clerk sent the gross instead of the net amount of a trade; the four-eye check was missing.", "core"),
-    "PS03": (SEC, COLL, "Routine collateral transfer to a clearing house sent with the wrong amount (EUR 28bn); recalled.", "core"),
-    "PS04": (PAY, SETT, "Amount entered with extra zeros passed the first reviewer and approver; caught by a later reconciliation.", "core"),
-    "PS05": (SEC, CHG, "Untested database field limit broke government-securities settlement; Fed overdraft of USD 23.6bn.", "core"),
-    "PS06": (STR, CAP, "Structured notes issued above the registered shelf amount; no automated check of issuance against the limit.", "core"),
-    "EX07": (STR, CAP, "Product parameters of structured certificates keyed in without a check; sold at a fraction of fair value.", "core"),
-    "CY01": (PAY, MSG, "Fraudulent SWIFT messages from a compromised terminal; nostro statement printing disabled, so reconciliation was late.", "core"),
-    "SM39": (PAY, MSG, "Third-party payment instructions not verified after a cyber fraud.", "core"),
-    "MO01": (FX, SETT, "Scheduled FX-swap leg released to a counterparty already in default; no stop linked to credit events.", "core"),
-    "MO02": (PAY, CHG, "SWIFT system configuration change made the payment software resend payments in a loop; no duplicate check.", "core"),
-    "MO03": (PAY, SETT, "Payment batch released twice by a scheduling error; no duplicate-file control.", "core"),
-    "MO04": (PAY, CHG, "After a system update, failed incoming transfers were credited as received; no check that funds had settled.", "core"),
-    "MO05": (PAY, NOST, "SWIFT commitments not reconciled to core banking; nostro reconciliation did not flag incoming funds moved out.", "core"),
-    "MO06": (IRD, CHG, "Zero-coupon swaps keyed in wrongly during a system migration; no trade-by-trade reconciliation until a swap matured.", "core"),
-    "MO07": (OTH, IPV, "Trader marks on ABS not challenged by price verification.", "analog"),
-    "MO08": (IRD, CAP, "Repo and interest rate swap booked as separate trades though contractually linked; agreement kept outside the books.", "core"),
-    "MO09": (FXO, IPV, "Volatilities of illiquid emerging-market FX options marked by traders and not independently verified.", "core"),
-    "MO10": (FX, SETT, "Principal paid away before the counter-currency was received (no payment-versus-payment).", "core"),
-    "MO11": (PAY, MSG, "Fraudulent SWIFT transfers with stolen credentials; messages not reconciled to the core system.", "core"),
-    "MO12": (PAY, MSG, "Fraudulent SWIFT transfers sent by malware; most recovered.", "core"),
-    "MO13": (PAY, NOST, "Control that WORKED: SWIFT confirmations reconciled against payment orders caught USD 110m of fraudulent transfers.", "core"),
-    "MO14": (PAY, MSG, "Fraudulent SWIFT transfers sent while a wiper attack distracted the bank.", "core"),
-    "RT04": (FXO, CONF, "Fictitious FX option trades never confirmed with counterparties; back office accepted the trader's rate feed for revaluation.", "core"),
-    "RT05": (FXO, IPV, "FX option revaluation rates supplied by the desk; limit breaches and confirmation queries not escalated.", "core"),
-    "RT06": (OTH, CONF, "Fictitious forwards with 'pending' counterparties; confirmation and nominal alerts not escalated.", "analog"),
-    "RT07": (OTH, SETT, "Forward-settling ETF trades booked as hedges were never settled; operations did not chase unsettled trades.", "analog"),
-    "RT08": (OTH, CAP, "Manual futures trade entries not reconciled to exchange records intraday.", "analog"),
-    "RT17": (OTH, CAP, "Booking system recognised profit on unsettled forward bond reconstitutions; no validation of the economics.", "analog"),
-    "RT01": (OTH, NOST, "Margin funding requests not reconciled to positions; one person ran trading and settlement.", "analog"),
-    "RT02": (OTH, NOST, "Trader also controlled settlement and custody records; custody holdings not independently confirmed.", "analog"),
-    "RT03": (OTH, CONF, "Off-book trades with forged confirmations; counterparty confirmations not obtained independently.", "analog"),
-    "RT20": (OTH, CAP, "Buy keyed as a sell; no independent check of trade entry against the order.", "analog"),
-    "OD07": (OTH, CAP, "Hundreds of fictitious trades over 18 months not detected by trade validation and price checks.", "analog"),
-    "SM09": (OTH, CAP, "Cross trade between funds booked at an off-market price; middle-office price check missing.", "analog"),
-    "MV01": (OTH, IPV, "Credit derivatives marked at the edge of bid-offer; spreadsheet VaR model error not validated.", "analog"),
-    "MV02": (OTH, IPV, "Option prices verified against quotes from a single colluding broker.", "analog"),
-    "MV03": (IRD, IPV, "Interest rate option (swaption) volatilities supplied by the trader and not independently verified.", "core"),
-    "MV04": (OTH, IPV, "Credit-index option marks not independently verified.", "analog"),
-    "MV05": (OTH, IPV, "Equity derivatives valued by traders; bank lost its licence.", "analog"),
-    "CM01": (PAY, SETT, "Client money transferred out of segregated accounts to meet liquidity needs; transfer controls overridden.", "core"),
-    "CM04": (OTH, NOST, "Client money held in house accounts after a systems change; daily segregation reconciliation wrong for years.", "analog"),
-    "CP01": (SEC, COLL, "Static margin terms and repeated limit breaches on a hedge-fund client; margin calls not enforced.", "core"),
-    "SM36": (IRD, CAP, "Controls over benchmark rate input data contributed by the bank were ineffective.", "core"),
-    "OD16": (IRD, REP, "Over 20m swaps back-reported; swap data and margin notices inaccurate.", "core"),
-    "OD17": (FX, REP, "FX forwards reported as FX spot; collateralised swaps reported as uncollateralised.", "core"),
-    "SM28": (FX, REP, "Over 40m swaps under- or misreported (FX classification).", "core"),
-    "SM29": (IRD, REP, "Nearly 4m swaps unreported or misreported due to allocation errors.", "core"),
-    "SM30": (IRD, REP, "At least 5m swaps misreported, breaching an earlier remediation order.", "core"),
-    "SM31": (IRD, REP, "Swap data repeatedly reported late.", "core"),
-    "SM32": (IRD, REP, "Millions of swaps reported wrongly or late (duplicate IDs, wrong terms).", "core"),
+    # ---- client & counterparty onboarding
+    "MO15": (IRD, ONB, "Banks did not verify that local-authority clients had legal capacity to enter swaps; 600+ contracts void.", CLI, "High",
+             "Any public-sector, municipal or special-purpose client: capacity and authorised signatories."),
+    "MO19": (FXO, ONB, "FX option hedges sold to exporters in excess of their real FX exposure; banks compensated clients.", CLI, "High",
+             "Client FX options and forwards: hedge size vs underlying exposure. Front-office led, back office can flag."),
+    "MO20": (OTH, ONB, "Credit and trading facilities given to a client trader without checking activity against the client's mandate.", CLI, "Medium",
+             "Client trader acting beyond mandate; corporate treasury clients."),
+    # ---- trade capture & back-to-back matching
+    "MO16": (STR, CAP, "Hedge of a client structured bond re-registered wrongly; unhedged for weeks.", B2B, "High",
+             "Exactly the back-to-back risk: client deal and hedge not matched daily."),
+    "EX07": (STR, CAP, "Structured certificate parameters keyed without a check; sold to clients at a fraction of value.", CLI, "High",
+             "Structured products for clients: term-sheet vs booking check."),
+    "PS06": (STR, CAP, "Structured notes issued above the registered amount; no automated limit check.", CLI, "Medium",
+             "Applies if the bank issues notes; for a distributor, the issuance check sits with the issuer."),
+    "MO08": (IRD, CAP, "Repo and interest rate swap booked as separate trades though contractually linked.", OWN, "Medium",
+             "Linked trades in own risk-management positions."),
+    "RT20": (OTH, CAP, "Buy keyed as a sell; no check of the booking against the order.", OWN, "Medium",
+             "Wrong direction on a hedge leg leaves the bank double exposed instead of flat."),
+    "OD07": (OTH, CAP, "Hundreds of fictitious trades not caught by trade validation.", OWN, "Medium", "Same validation on a smaller book."),
+    "SM09": (OTH, CAP, "Trade between client funds booked at an off-market price; no price check at entry.", CLI, "Medium",
+             "Off-market rates on client deals."),
+    "RT08": (OTH, CAP, "Manual trade entries not reconciled to the exchange.", OWN, "Low", "Large trading book."),
+    "RT17": (OTH, CAP, "System booked profit on unsettled forward trades.", OWN, "Low", "Large trading book."),
+    "SM36": (IRD, CAP, "Benchmark input data contributed by the bank not controlled.", OWN, "Low", "Only for benchmark contributors."),
+    # ---- confirmations
+    "RT04": (FXO, CONF, "Fictitious FX options never confirmed with counterparties; revaluation rates taken from the trader.", OWN, "High",
+             "Small FX desk at a regional bank: the closest match to a bank with small own positions."),
+    "RT03": (OTH, CONF, "Client's trader dealt off-book; confirmations went to the trader, not to independent staff.", CLI, "Medium",
+             "Send client confirmations to someone independent of the dealer."),
+    "RT06": (OTH, CONF, "Fictitious forwards with 'pending' counterparties; alerts not escalated.", OWN, "Low", "Large trading book."),
+    # ---- price verification
+    "RT05": (FXO, IPV, "FX option revaluation rates supplied by the desk.", OWN, "Medium", "Residual FX option risk after back-to-back hedging."),
+    "MO09": (FXO, IPV, "Illiquid EM FX option volatilities marked by traders.", OWN, "Medium", "Residual FX option risk; illiquid currency pairs."),
+    "MV03": (IRD, IPV, "Swaption volatilities supplied by the trader.", OWN, "Medium", "Unhedged swaption, cap or floor residuals."),
+    "MO07": (OTH, IPV, "Trader marks on ABS not challenged.", OWN, "Low", "Large trading book."),
+    "MV01": (OTH, IPV, "Marks at the edge of bid-offer; spreadsheet model error.", OWN, "Low", "Large trading book."),
+    "MV02": (OTH, IPV, "Prices verified against one colluding broker.", OWN, "Low", "Large trading book."),
+    "MV04": (OTH, IPV, "Option marks not verified.", OWN, "Low", "Large trading book."),
+    "MV05": (OTH, IPV, "Derivatives valued by traders.", OWN, "Low", "Large trading book."),
+    # ---- collateral, margin & credit limits
+    "MO17": (FX, COLL, "Client margin did not cover a currency gap; client losses exceeded collateral.", CLI, "High",
+             "Client FX forwards and options on credit lines: gap-risk and margin on a peg or managed currency."),
+    "MO18": (FX, COLL, "Client margin set for normal volatility.", CLI, "Medium", "Same as above; retail broker setting."),
+    "CP01": (SEC, COLL, "Static margin and repeated limit breaches on a client not enforced.", CLI, "Medium",
+             "Client limit breaches tolerated; scale is prime brokerage."),
+    "PS03": (SEC, COLL, "Collateral transfer sent with the wrong amount (EUR 28bn); recalled.", CPT, "Medium", "CSA and clearing margin transfers."),
+    # ---- payment release & settlement
+    "MO01": (FX, SETT, "FX-swap leg released to a counterparty already in default.", CPT, "High",
+             "Interbank FX and FX swaps: stop payments on a credit event."),
+    "MO10": (FX, SETT, "Principal paid away before the counter-currency arrived (no PvP).", CPT, "High",
+             "FX settled outside CLS with counterparties and clients."),
+    "PS02": (FX, SETT, "Gross instead of net amount sent; four-eye check missing.", CLI, "High", "FX settlement with clients."),
+    "PS01": (MM, SETT, "Principal paid instead of interest via manual override; three approvers passed it.", CLI, "High",
+             "Loan and deposit payments to clients."),
+    "PS04": (PAY, SETT, "Amount with extra zeros passed two approvers.", CLI, "High", "Any manual payment entry."),
+    "MO03": (PAY, SETT, "Payment batch released twice.", CLI, "High", "Bulk client payments."),
+    "CM01": (PAY, SETT, "Client money moved out of segregated accounts under liquidity stress.", CLI, "Medium", "Client cash and margin accounts."),
+    "RT07": (OTH, SETT, "Forward-settling trades never settled; not chased.", OWN, "Low", "Large trading book."),
+    # ---- instruction verification & message security
+    "MO21": (PAY, INSTR, "Client instruction executed without call-back to the account holder; signature mismatch ignored.", CLI, "High",
+             "Client payment and settlement instructions."),
+    "SM39": (PAY, INSTR, "Third-party payment instructions not verified.", CLI, "High", "Client payment instructions."),
+    "CY01": (PAY, INSTR, "Fraudulent SWIFT messages from the bank's own terminal; statements not reviewed in time.", PAYS, "High", "SWIFT and nostros."),
+    "MO11": (PAY, INSTR, "Fraudulent SWIFT transfers with stolen credentials.", PAYS, "High", "SWIFT and nostros."),
+    "MO12": (PAY, INSTR, "Fraudulent SWIFT transfers sent by malware.", PAYS, "High", "SWIFT and nostros."),
+    "MO14": (PAY, INSTR, "Fraudulent SWIFT transfers during a wiper attack.", PAYS, "High", "SWIFT and nostros."),
+    # ---- nostro & cash reconciliation
+    "MO05": (PAY, NOST, "SWIFT commitments not reconciled to core banking; nostro breaks not escalated.", PAYS, "High", "SWIFT vs core banking vs nostro."),
+    "MO13": (PAY, NOST, "Control that WORKED: SWIFT confirmations reconciled to payment orders caught USD 110m.", PAYS, "High", "Same-day SWIFT reconciliation."),
+    "RT01": (OTH, NOST, "Funding requests not reconciled to positions; one person in front and back office.", OWN, "Medium", "Small overseas office."),
+    "RT02": (OTH, NOST, "Trader controlled settlement and custody records.", OWN, "Medium", "Segregation of duties in a small office."),
+    "CM04": (OTH, NOST, "Client money in house accounts after a systems change.", CLI, "Medium", "Client cash accounts."),
+    # ---- client rates, charges & interest
+    "MC06": (FX, BILL, "FX rates applied to custody clients differed from what clients were told.", CLI, "High", "Client FX rates and spreads."),
+    "MC07": (FX, BILL, "FX rates applied to custody clients differed from what clients were told.", CLI, "High", "Client FX rates and spreads."),
+    "AP01": (STR, BILL, "Spreads on bond and structured-product trades not checked against client agreements.", CLI, "High", "Client spreads on structured products."),
+    "SM05": (FX, BILL, "Price improvements kept from clients; asymmetric slippage.", CLI, "Medium", "Client FX execution."),
+    # ---- regulatory reporting
+    "OD17": (FX, REP, "FX forwards reported as spot; collateral flags wrong.", REG, "High", "EMIR reporting of client FX forwards."),
+    "SM28": (FX, REP, "Over 40m swaps misreported (FX classification).", REG, "High", "EMIR reporting of client FX."),
+    "OD16": (IRD, REP, "Over 20m swaps back-reported.", REG, "Medium", "Swap reporting."),
+    "SM29": (IRD, REP, "Allocation errors in swap reports.", REG, "Medium", "Swap reporting."),
+    "SM30": (IRD, REP, "Swaps misreported, breaching an earlier order.", REG, "Medium", "Swap reporting."),
+    "SM31": (IRD, REP, "Swap data reported late.", REG, "Medium", "Swap reporting."),
+    "SM32": (IRD, REP, "Swaps reported wrongly or late.", REG, "Medium", "Swap reporting."),
+    # ---- system change & static data
+    "MO06": (IRD, CHG, "Swaps keyed wrongly in a system migration; not reconciled until a swap matured.", B2B, "High",
+             "Migration of client and hedge swaps: reconcile cash flows trade by trade."),
+    "MO02": (PAY, CHG, "SWIFT configuration change sent payments in a loop.", PAYS, "High", "Payment system changes."),
+    "MO04": (PAY, CHG, "After an update, failed incoming transfers were credited as received.", PAYS, "High", "Payment system changes."),
+    "PS05": (SEC, CHG, "Untested field limit broke securities settlement.", PAYS, "Medium", "Settlement system changes."),
 }
 
-# Scenario prompts per process step (expert synthesis for workshops)
 STEPS = {
-    CAP: {"validation": "Trade booked matches the deal (economics, counterparty, product parameters); booked within limits; linked trades booked as one.",
-          "scenario": "A structured or derivative trade is booked with a wrong parameter (notional, strike, barrier, unit) or as separate legs, and the error runs undetected until a cash flow or maturity."},
-    CONF: {"validation": "Every OTC trade is confirmed directly with the counterparty, unmatched or unconfirmed trades are aged and escalated.",
-           "scenario": "Fictitious or mis-booked FX option or swap trades remain unconfirmed for months because confirmation exceptions are accepted or routed back to the desk."},
-    SETT: {"validation": "Payments are released only after four-eye or six-eye checks, duplicate and amount-limit checks, and a stop on counterparties in default.",
-           "scenario": "A large FX or money-market payment is released with the wrong amount, twice, or to a counterparty that has just defaulted, and cannot be recalled."},
-    NOST: {"validation": "Nostro statements (MT950/camt.053) and SWIFT traffic are reconciled to the books daily and breaks are aged and escalated.",
-           "scenario": "Incoming or outgoing funds on a nostro do not match booked trades, but breaks are left open, so a fraud or error builds up for months."},
-    IPV: {"validation": "Every position is revalued with market data independent of the desk (rates, FX vols, swaption vols), with challenge of stale or single-source quotes.",
-          "scenario": "Illiquid FX option or swaption volatilities are taken from the desk or one broker; a later independent revaluation forces a large write-down."},
-    COLL: {"validation": "Collateral calls and transfers are calculated from validated exposures and checked for amount and counterparty before release.",
-           "scenario": "A collateral transfer to a clearing house or counterparty is sent with the wrong amount, or margin calls on a large client are not enforced."},
-    CHG: {"validation": "System changes and migrations are tested, and positions and cash flows are reconciled trade by trade before and after go-live.",
-          "scenario": "A payment or trading-system change (SWIFT, settlement or rates engine) creates duplicate payments or wrongly migrated swap cash flows."},
-    MSG: {"validation": "SWIFT access is secured and outgoing messages are matched to approved payment orders before and after sending.",
-          "scenario": "Fraudulent SWIFT payments are sent from the bank's own terminal outside office hours and are noticed only on the next nostro statement."},
-    REP: {"validation": "Trade reports (EMIR, CFTC) are reconciled to the books for completeness and accuracy, with classification checks (spot vs forward).",
-          "scenario": "Years of FX forward or swap reports are incomplete or misclassified, leading to back-reporting and a regulatory fine."},
+    ONB: {"validation": "Before the first deal: legal capacity and authorised signatories, ISDA/CSA in place, credit line, and hedge size vs the client's real exposure.",
+          "scenario": "A client (municipality, SME or corporate treasury) disputes or cannot honour derivative deals because it lacked capacity or authority, or the hedge was larger than its exposure."},
+    CAP: {"validation": "Every client deal has a matching hedge (same notional, dates, strike, direction) and both match the term sheet; mismatches are flagged the same day.",
+          "scenario": "A client FX option or structured product is hedged with a wrong leg (direction, notional or barrier), and the bank is unhedged until a fixing or maturity."},
+    CONF: {"validation": "Client and counterparty confirmations are sent and matched by staff independent of the dealer; unconfirmed trades are aged and escalated.",
+           "scenario": "Unconfirmed client or interbank deals pile up; a fictitious or disputed trade is found months later."},
+    IPV: {"validation": "Residual own positions and the client/hedge pairs are revalued with independent rates and volatilities.",
+          "scenario": "A small own FX option or swaption position is marked by the desk; independent revaluation forces a write-down."},
+    COLL: {"validation": "Client exposures on forwards and options are compared with credit lines and collateral daily, with gap-risk stress for pegged currencies.",
+           "scenario": "A sudden currency move (like the 2015 Swiss franc unpeg) leaves client losses above collateral and credit lines, and clients default."},
+    SETT: {"validation": "Payments are released after four-eye checks, duplicate and amount-limit checks, and are stopped for counterparties in default.",
+           "scenario": "An FX or money-market payment goes out with the wrong amount, twice, or to a counterparty that defaulted that morning."},
+    INSTR: {"validation": "Client instructions and changes to settlement instructions are verified by call-back; SWIFT access is secured and messages matched to approved orders.",
+            "scenario": "A fraudster changes a client's settlement instructions or sends SWIFT messages from the bank's own terminal."},
+    NOST: {"validation": "Nostro statements and SWIFT traffic are reconciled to the books the same day; breaks are aged and escalated.",
+           "scenario": "Breaks on a nostro are left open and a fraud or payment error builds up for weeks."},
+    BILL: {"validation": "Rates, spreads and interest charged to clients are checked against the agreed terms.",
+           "scenario": "Client FX spreads or interest are charged above agreement for years, leading to restitution and fines."},
+    REP: {"validation": "EMIR/CFTC reports are reconciled to the books, including product classification (spot vs forward).",
+          "scenario": "Years of client FX forwards are misreported, leading to back-reporting and a fine."},
+    CHG: {"validation": "Changes and migrations of payment and derivatives systems are tested and reconciled trade by trade and cash flow by cash flow.",
+          "scenario": "A payment-system or swaps-system change duplicates payments or migrates client and hedge cash flows wrongly."},
 }
 
 
@@ -110,25 +159,28 @@ def main():
     keep = ["event_id", "announced", "year", "firm", "country", "region", "loss_usd_m", "near_miss", "exposure_usd_m",
             "loss_band", "internal_fraud", "basel_event_type", "what_happened", "loss_components", "years_undetected",
             "official_source", "source_1", "source_2", "confidence"]
+    rank = {"High": 0, "Medium": 1, "Low": 2}
     rows = []
-    for k, (prod, step, val, rel) in TAGS.items():
+    for k, (prod, step, val, src, fit, why) in TAGS.items():
         r = {c: lib[k][c] for c in keep}
-        r.update(product=prod, process_step=step, validation_failed=val, relevance=rel)
+        r.update(product=prod, process_step=step, validation_failed=val, exposure_source=src, fit=fit, fit_reason=why)
         rows.append(r)
-    rows.sort(key=lambda r: (r["process_step"], r["announced"]))
-    cols = ["event_id", "announced", "firm", "product", "process_step", "validation_failed", "relevance", "internal_fraud",
-            "loss_usd_m", "near_miss", "exposure_usd_m", "loss_band", "region", "country", "year", "basel_event_type",
-            "what_happened", "loss_components", "years_undetected", "official_source", "source_1", "source_2", "confidence"]
+    rows.sort(key=lambda r: (ORDER.index(r["process_step"]), rank[r["fit"]], r["announced"]))
+    cols = ["event_id", "announced", "firm", "fit", "fit_reason", "exposure_source", "product", "process_step", "validation_failed",
+            "internal_fraud", "loss_usd_m", "near_miss", "exposure_usd_m", "loss_band", "region", "country", "year",
+            "basel_event_type", "what_happened", "loss_components", "years_undetected", "official_source", "source_1",
+            "source_2", "confidence"]
     with open(HERE / "market_ops_bo.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
         w.writerows(rows)
     num = lambda v: float(v) if v not in ("", None) else None
-    js = [{**r, "loss_usd_m": num(r["loss_usd_m"]), "exposure_usd_m": num(r["exposure_usd_m"]),
-           "years_undetected": num(r["years_undetected"])} for r in rows]
-    (HERE / "market_ops_bo.json").write_text(json.dumps({"events": js, "steps": STEPS,
-                                                         "products": [FX, FXO, IRD, STR, MM, PAY, SEC, OTH]}, ensure_ascii=False))
-    print(f"{len(rows)} market-ops events ({sum(r['relevance'] == 'core' for r in rows)} core)")
+    js = [{**r, "loss_usd_m": num(r["loss_usd_m"]), "exposure_usd_m": num(r["exposure_usd_m"])} for r in rows]
+    (HERE / "market_ops_bo.json").write_text(json.dumps({
+        "events": js, "steps": STEPS, "order": ORDER, "products": [FX, FXO, IRD, STR, MM, PAY, SEC, OTH],
+        "sources": [CLI, CPT, B2B, PAYS, OWN, REG]}, ensure_ascii=False))
+    from collections import Counter
+    print(len(rows), Counter(r["fit"] for r in rows), Counter(r["exposure_source"] for r in rows))
 
 
 if __name__ == "__main__":
