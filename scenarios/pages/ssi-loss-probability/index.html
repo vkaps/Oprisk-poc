@@ -87,11 +87,11 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.
           <legend>Method A · industry rate</legend>
           <div class="f"><label for="ctrl">How SSIs are set up and changed</label>
             <select id="ctrl">
-              <option value="0.05">Strong: SWIFT/directory SSIs; every change called back to a known contact; four eyes</option>
-              <option value="0.2" selected>Typical bank: client SSIs by letter or email, always called back</option>
-              <option value="0.5">Weak: email changes accepted; call-back not always done</option>
-              <option value="1">Like a corporate accounts-payable team</option>
-            </select><small>Multiplies the corporate rate: 0.05, 0.2, 0.5 or 1.</small></div>
+              <option value="0.05">Strong: SWIFT/directory SSIs only; every change called back; four eyes</option>
+              <option value="0.2">Call-back to a known contact on every SSI change</option>
+              <option value="0.5" selected>No call-back; interbank SSIs via SWIFT, client SSI changes by letter or email</option>
+              <option value="1">No call-back; any SSI change accepted by email</option>
+            </select><small>Multiplies the corporate rate: 0.05, 0.2, 0.5 or 1. Without call-back, use 0.5 or 1.</small></div>
           <div class="f"><label for="expo">Payment volume vs a typical large corporate payer</label>
             <input id="expo" type="number" min="0.1" max="50" step="0.1" value="1"><small>2 = twice as many payments of USD 1m or more.</small></div>
         </fieldset>
@@ -102,6 +102,8 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.
         </fieldset>
         <fieldset>
           <legend>Method B · your caught attempts</legend>
+          <label style="display:flex;gap:6px;align-items:center;font-size:.92rem"><input type="checkbox" id="cb"> We call back every SSI change</label>
+          <p class="note" id="cb-note">Without call-back, fake SSI changes are not caught, so "none caught so far" says nothing about attempts. Method B is switched off.</p>
           <div class="f"><label for="att">Fake SSI changes caught per year</label><input id="att" type="number" min="0" max="500" step="1" value="2"><small>Stopped by call-back or other checks. Set 0 to skip Method B.</small></div>
           <div class="f"><label for="shr">Share aimed at payments of 1m or more (%)</label><input id="shr" type="number" min="0" max="100" step="1" value="20"></div>
           <div class="f"><label for="miss">Share of attempts your controls miss (%)</label><input id="miss" type="number" min="0" max="60" step="0.5" value="2"><small>For typical organisations about half of email payment-fraud attempts succeed; a bank with mandatory call-back should be far lower.</small></div>
@@ -198,27 +200,38 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.
     const corp = M.scenarios.central.corporate_rate, err = M.assumptions.error_upper;
     const lamA = corp * ctrl * expo + err;
     const lamPost = (1 + n) / (1 / lamA + T);
-    const lamB = att > 0 ? att * shr * miss / (1 - miss) + err : null;
+    const cb = $("cb").checked;
+    ["att", "shr", "miss"].forEach((id) => { $(id).disabled = !cb; });
+    $("cb-note").hidden = cb;
+    const lamB = cb && att > 0 ? att * shr * miss / (1 - miss) + err : null;
+    // own history alone: 95% upper bound on the rate of net losses >= 1m (chi-square / Wilson-Hilferty)
+    const k = 2 * n + 2, z = 1.645, chi = k * Math.pow(1 - 2 / (9 * k) + z * Math.sqrt(2 / (9 * k)), 3), upper = chi / 2 / T;
+    const lamCB = corp * 0.2 * expo + err, lamCBpost = (1 + n) / (1 / lamCB + T);
     const s = severity(alpha, cap, rec);
     const rows = [
       { k: "A", name: "Method A · industry rate", lam: lamA },
       { k: "P", name: `Method A + your history (${n} in ${T} yrs)`, lam: lamPost, hl: true },
     ];
     if (lamB != null) rows.push({ k: "B", name: "Method B · your caught attempts", lam: lamB, hl: true });
+    if (ctrl > 0.2) rows.push({ k: "C", name: "If you add call-back on every change", lam: lamCBpost });
     $("res").innerHTML = `<thead><tr><th>Estimate</th><th>Frauds or errors ≥ $1m per year</th><th>Net loss ≥ $1m</th><th>Net loss ≥ $10m</th><th>Net loss ≥ $50m</th><th>Expected loss / yr</th></tr></thead><tbody>` +
       rows.map((r) => { const p1 = annual(r.lam, s.q1), p10 = annual(r.lam, s.q10), p50 = annual(r.lam, s.q50);
         return `<tr class="${r.hl ? "hl" : ""}"><td>${esc(r.name)}</td><td class="n">${r.lam.toFixed(r.lam < 0.01 ? 5 : 3)}</td>
           <td class="n">${pct(p1)}<br><span class="note">${rp(p1)}</span></td><td class="n">${pct(p10)}<br><span class="note">${rp(p10)}</span></td>
-          <td class="n">${pct(p50)}<br><span class="note">${rp(p50)}</span></td><td class="n">${usd(r.lam * s.mean)}</td></tr>`; }).join("") + "</tbody>";
+          <td class="n">${pct(p50)}<br><span class="note">${rp(p50)}</span></td><td class="n">${usd(r.lam * s.mean)}</td></tr>`; }).join("") +
+      `<tr><td>Your history alone: ${n} in ${T} yrs (95% upper bound)</td><td class="n">≤ ${upper.toFixed(3)}</td><td class="n">≤ ${pct(1 - Math.exp(-upper))}<br><span class="note">not a central estimate</span></td><td class="n">–</td><td class="n">–</td><td class="n">–</td></tr></tbody>`;
     const lo = annual(lamPost, s.q1), hi = lamB != null ? annual(lamB, s.q1) : null;
     const a = Math.min(lo, hi ?? lo), b = Math.max(lo, hi ?? lo);
     $("answer").innerHTML = `
       <div class="big"><span class="eyebrow">Net loss ≥ $1m in a year</span><span class="v">${hi != null && Math.abs(hi - lo) / lo > 0.2 ? pct(a) + " – " + pct(b) : pct(lo)}</span><span class="s">${hi != null && Math.abs(hi - lo) / lo > 0.2 ? rp(b) + " to " + rp(a) : rp(lo)}</span></div>
       <div class="big"><span class="eyebrow">Net loss ≥ $10m in a year</span><span class="v">${hi != null && Math.abs(hi - lo) / lo > 0.2 ? pct(annual(Math.min(lamPost, lamB), s.q10)) + " – " + pct(annual(Math.max(lamPost, lamB), s.q10)) : pct(annual(lamPost, s.q10))}</span><span class="s">about ${Math.round(s.q1 / Math.max(s.q10, 1e-9))}× rarer than ≥ $1m</span></div>
       <div class="big"><span class="eyebrow">Typical net loss when it happens</span><span class="v">${usd(s.mean)}</span><span class="s">mean, gross ≥ $1m, after ${Math.round(rec * 100)}% recovery</span></div>`;
-    $("answer-note").textContent = lamB != null
+    const extra = ctrl > 0.2 ? ` Adding call-back on every SSI change would cut this to about ${pct(annual(lamCBpost, s.q1))} (${rp(annual(lamCBpost, s.q1))}). ` +
+      `Your own record of ${n} losses in ${T} years only proves the rate is below about ${pct(1 - Math.exp(-upper))} a year, so the industry rate carries the estimate.` : "";
+    $("answer-note").textContent = (lamB != null
       ? "The range runs from the industry rate updated with your loss history to the rate implied by the attempts you catch. Fill in your own attempt counts: they move the answer most."
-      : "Based on the industry rate updated with your loss history. Add your caught attempts for a bank-specific estimate.";
+      : (cb ? "Based on the industry rate updated with your loss history. Add your caught attempts for a bank-specific estimate."
+            : "Based on the industry rate for a bank without call-back, updated with your loss history.")) + extra;
   }
 
   function events() {
@@ -231,7 +244,7 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.
     }).join("");
   }
 
-  ["ctrl", "expo", "n", "T", "att", "shr", "miss", "cap", "rec", "tail"].forEach((id) => $(id).addEventListener("input", run));
+  ["ctrl", "expo", "n", "T", "cb", "att", "shr", "miss", "cap", "rec", "tail"].forEach((id) => $(id).addEventListener("input", run));
   fetch("ssi_model.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((j) => {
     M = j; $("m-n").textContent = Math.round(j.us_ge1m_reported); $("m-c").textContent = (j.scenarios.central.corporate_rate * 100).toFixed(2) + "%";
     events(); run();
