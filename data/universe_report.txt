@@ -3,9 +3,9 @@
 2/5 EBA transparency exercise (EU/EEA banks) ...
   EBA 2017: no 'Total assets' rows - skipped
   EBA 2018: no 'Total assets' rows - skipped
-  EBA 2019: 121 banks, years [np.int64(2018), np.int64(2019)] (1s)
-  EBA 2020: 119 banks, years [np.int64(2019)] (1s)
-  EBA 20202: 123 banks, years [np.int64(2020)] (1s)
+  EBA 2019: 121 banks, years [np.int64(2018), np.int64(2019)] (2s)
+  EBA 2020: 119 banks, years [np.int64(2019)] (2s)
+  EBA 20202: 123 banks, years [np.int64(2020)] (2s)
   EBA 2021: 110 banks, years [np.int64(2020), np.int64(2021)] (2s)
   EBA 2022: 115 banks, years [np.int64(2021), np.int64(2022)] (2s)
   EBA 2023: 113 banks, years [np.int64(2022), np.int64(2023)] (2s)
