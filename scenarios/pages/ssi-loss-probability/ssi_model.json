@@ -1,0 +1,222 @@
+{
+ "events": [
+  {
+   "event_id": "SSI01",
+   "announced": "2017-03",
+   "firm": "Facebook and Google (Rimasauskas)",
+   "sector": "Corporate",
+   "country": "US",
+   "ssi_type": "Fake payee bank details",
+   "what_happened": "A fraudster set up a company named like a real supplier (Quanta), sent invoices and fake 'bank letters' telling staff to pay his accounts in Latvia and Cyprus, 2013-2015.",
+   "gross_usd_m": 122.0,
+   "net_loss_usd_m": null,
+   "recovery": "Most recovered; USD 50m forfeited",
+   "fit": "High",
+   "source_1": "https://www.theregister.com/2019/03/21/facebook_google_scam/",
+   "source_2": "",
+   "confidence": "High"
+  },
+  {
+   "event_id": "SSI02",
+   "announced": "2017-12",
+   "firm": "Japan Airlines",
+   "sector": "Corporate",
+   "country": "Japan",
+   "ssi_type": "Counterparty SSI change",
+   "what_happened": "Emails posing as the US aircraft lessor and a logistics provider asked JAL to pay lease and commission payments to new Hong Kong accounts instead of the usual US accounts.",
+   "gross_usd_m": 3.4,
+   "net_loss_usd_m": 3.4,
+   "recovery": "Not recovered (reported)",
+   "fit": "High",
+   "source_1": "https://thepaypers.com/fraud-and-fincrime/news/japan-airlines-pays-out-usd-34-million-to-hong-kong-accounts-in-bank-transfer-scam",
+   "source_2": "",
+   "confidence": "High"
+  },
+  {
+   "event_id": "SSI03",
+   "announced": "2018-10",
+   "firm": "Tecnimont Arabia",
+   "sector": "Corporate treasury",
+   "country": "Saudi Arabia/UK",
+   "ssi_type": "Counterparty SSI change",
+   "what_happened": "From a hacked mailbox of the lender's finance director, an email said the usual bank details were 'under review' and gave a new NatWest account; a USD 5m loan repayment was paid and moved out within days.",
+   "gross_usd_m": 5.0,
+   "net_loss_usd_m": 4.36,
+   "recovery": "About USD 0.64m recovered; claim against the receiving bank failed",
+   "fit": "High",
+   "source_1": "https://caselaw.nationalarchives.gov.uk/ewhc/comm/2022/1172",
+   "source_2": "",
+   "confidence": "High"
+  },
+  {
+   "event_id": "SSI04",
+   "announced": "2019-08",
+   "firm": "Toyota Boshoku (European subsidiary)",
+   "sector": "Corporate",
+   "country": "Europe",
+   "ssi_type": "False payment instructions",
+   "what_happened": "A third party's false payment instructions led to an outflow of up to JPY 4bn; reported in the press as a change of account information.",
+   "gross_usd_m": 36.7,
+   "net_loss_usd_m": 36.7,
+   "recovery": "Recovery attempted; maximum loss stated",
+   "fit": "Medium",
+   "source_1": "https://www2.jpx.co.jp/disc/31160/140120190906495579.pdf",
+   "source_2": "https://thepaypers.com/payments/news/toyota-boshoku-subsidiary-loses-over-usd-37-million-in-bec-fraud",
+   "confidence": "Medium"
+  },
+  {
+   "event_id": "SSI05",
+   "announced": "2020-01",
+   "firm": "Puerto Rico Industrial Development Company",
+   "sector": "Public sector",
+   "country": "US",
+   "ssi_type": "Counterparty SSI change",
+   "what_happened": "An email said the bank account for remittance payments had changed; USD 2.6m was sent to the fraudster's account.",
+   "gross_usd_m": 2.6,
+   "net_loss_usd_m": 2.6,
+   "recovery": "Partly frozen (not quantified)",
+   "fit": "High",
+   "source_1": "https://www.pbs.org/newshour/nation/official-says-puerto-rico-government-lost-2-6m-in-phishing-scam",
+   "source_2": "",
+   "confidence": "High"
+  },
+  {
+   "event_id": "SSI06",
+   "announced": "2020-03",
+   "firm": "Norfund (Norwegian development fund)",
+   "sector": "Investment fund",
+   "country": "Norway",
+   "ssi_type": "Counterparty SSI change",
+   "what_happened": "Fraudsters intercepted emails with a Cambodian borrower and changed the payment details of a USD 10m loan disbursement to an account with the borrower's name but not its owner; found six weeks later.",
+   "gross_usd_m": 10.0,
+   "net_loss_usd_m": 10.0,
+   "recovery": "Not recovered (reported)",
+   "fit": "High",
+   "source_1": "https://www.norfund.no/norfund-has-been-exposed-to-a-serious-case-of-fraud/",
+   "source_2": "",
+   "confidence": "High"
+  },
+  {
+   "event_id": "SSI07",
+   "announced": "2020-09",
+   "firm": "Levitas Capital (via fund administrator)",
+   "sector": "Investment fund",
+   "country": "Australia",
+   "ssi_type": "Fake payee bank details",
+   "what_happened": "After a fake Zoom invite gave access to email, USD 8.7m of fake invoices to previously unused accounts were approved by the administrator on spoofed email approval; most transfers were stopped.",
+   "gross_usd_m": 8.7,
+   "net_loss_usd_m": 0.8,
+   "recovery": "About USD 7.9m stopped",
+   "fit": "High",
+   "source_1": "https://www.acaglobal.com/industry-insights/zoom-scam-forces-closure-australian-hedge-fund/",
+   "source_2": "",
+   "confidence": "High"
+  },
+  {
+   "event_id": "SSI08",
+   "announced": "2025-07",
+   "firm": "NTMA / Ireland Strategic Investment Fund",
+   "sector": "Investment fund",
+   "country": "Ireland",
+   "ssi_type": "Counterparty SSI change",
+   "what_happened": "A payment request imitating an existing investee company (a capital call) was paid to the fraudster; NTMA controls did not stop it.",
+   "gross_usd_m": 5.65,
+   "net_loss_usd_m": 2.83,
+   "recovery": "EUR 2.5m of EUR 5m recovered",
+   "fit": "High",
+   "source_1": "https://www.irishexaminer.com/business/economy/arid-41917936.html",
+   "source_2": "https://www.irishtimes.com/crime-law/2025/07/12/up-to-5m-goes-missing-after-ntma-falls-victim-to-phishing-scam/",
+   "confidence": "High"
+  }
+ ],
+ "base": {
+  "swift_ssi_errors_per_year": 40000000.0,
+  "swift_ssi_error_cost_usd": 700000000.0,
+  "swift_year": 2011,
+  "dtcc_share_fails_ssi": 0.2,
+  "ic3_bec_complaints_2024": 21442,
+  "ic3_bec_losses_2024_usd": 2770000000.0,
+  "moore_success_rate": 0.525,
+  "moore_share_success_over_1m": 0.014,
+  "moore_dollar_share_over_1m": 0.31,
+  "afp_2025_bec_targeted": 0.74,
+  "afp_2025_loss_rev_over_1bn": 0.66,
+  "uk_invoice_mandate_cases_2024": 5759,
+  "uk_invoice_mandate_losses_2024_gbp": 42700000.0
+ },
+ "assumptions": {
+  "reporting_rate": [
+   0.3,
+   0.5,
+   0.7
+  ],
+  "redirect_share": [
+   0.4,
+   0.5,
+   0.6
+  ],
+  "large_payers": [
+   60000,
+   40000,
+   25000
+  ],
+  "bank_control_factor": [
+   0.05,
+   0.2,
+   0.5
+  ],
+  "pareto_alpha": [
+   1.0,
+   0.8,
+   0.6
+  ],
+  "recovery_mean": 0.3,
+  "error_upper": 0.0001
+ },
+ "scenarios": {
+  "low": {
+   "corporate_rate": 0.0035021933333333343,
+   "bank_rate_fraud": 0.00017510966666666673,
+   "lambda": 0.00018510966666666673,
+   "alpha": 1.0,
+   "p_any_1m_gross": 0.0001525,
+   "p_net_ge_1m": 0.0001025,
+   "p_net_ge_10m": 1e-05,
+   "expected_loss_m": 0.00047093469071325564,
+   "q99_m": 0.0,
+   "q999_m": 0.0,
+   "return_period_net_1m": 9756.09756097561,
+   "return_period_net_10m": 99999.99999999999
+  },
+  "central": {
+   "corporate_rate": 0.0039399675000000006,
+   "bank_rate_fraud": 0.0007879935000000001,
+   "lambda": 0.0008379935000000002,
+   "alpha": 0.8,
+   "p_any_1m_gross": 0.0007725,
+   "p_net_ge_1m": 0.0005675,
+   "p_net_ge_10m": 6.5e-05,
+   "expected_loss_m": 0.003948077634342325,
+   "q99_m": 0.0,
+   "q999_m": 0.0,
+   "return_period_net_1m": 1762.114537444934,
+   "return_period_net_10m": 15384.615384615387
+  },
+  "high": {
+   "corporate_rate": 0.005403384,
+   "bank_rate_fraud": 0.002701692,
+   "lambda": 0.0028016919999999997,
+   "alpha": 0.6,
+   "p_any_1m_gross": 0.0026975,
+   "p_net_ge_1m": 0.00215,
+   "p_net_ge_10m": 0.000475,
+   "expected_loss_m": 0.025082286857276464,
+   "q99_m": 0.0,
+   "q999_m": 3.3200457672419756,
+   "return_period_net_1m": 465.1162790697674,
+   "return_period_net_10m": 2105.2631578947367
+  }
+ },
+ "hill_alpha_public": 0.5661767432575281,
+ "us_ge1m_reported": 157.5987
+}

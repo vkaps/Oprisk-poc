@@ -43,3 +43,14 @@ The $1m–10m tier is therefore UK-heavy. Use it for scenario ideas and control-
 | `validation_failed` | The check that failed. |
 
 Rebuild with `python scenarios/build_market_ops.py` after `build_extreme_events.py`.
+
+## Wrong SSI losses and probability
+
+[`ssi/ssi_events.csv`](ssi/ssi_events.csv) lists every public loss of USD 1m or more where the only failure was the payee's bank details (8 cases, all fraud). No honest SSI error with a lost principal of 1m or more was found.
+
+[`ssi/build_ssi.py`](ssi/build_ssi.py) estimates the annual probability for one bank:
+- **Method A:** FBI business email compromise counts, times the share of losses over USD 1m from a study of 7,925 FBI cases, gives a corporate rate per large payer. That rate is scaled by a control factor and updated with the bank's own loss history (Gamma-Poisson).
+- **Method B:** the bank's caught fake SSI changes per year, times the share its controls miss.
+- **Severity:** a Pareto tail above USD 1m, capped at the largest payment, less a random recovery.
+
+The interactive version is in `pages/ssi-loss-probability`.
